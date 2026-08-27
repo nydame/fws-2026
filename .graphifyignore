@@ -1,0 +1,3 @@
+# CLAUDE.md is a symlink to AGENTS.md — identical content, so extracting both
+# produced duplicate node pairs linked by semantically_similar_to edges.
+/CLAUDE.md
