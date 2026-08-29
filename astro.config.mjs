@@ -8,4 +8,6 @@ export default defineConfig({
 	// Prerendered by default; only the Client Inquiry endpoint (not yet built)
 	// will opt out per-route with `export const prerender = false`.
 	output: 'static',
+	// Canonical + Open Graph/Twitter metadata need an absolute origin.
+	site: 'https://go-firefly.com',
 });
