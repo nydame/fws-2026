@@ -1,0 +1,16 @@
+{
+	"$schema": "node_modules/wrangler/config-schema.json",
+	"name": "fws-2026",
+	"compatibility_date": "2026-08-22",
+	"compatibility_flags": ["nodejs_compat"],
+	// D1 storage for the Client Inquiry pipeline (docs/adr/0001-client-inquiry-pipeline.md).
+	// No real database has been provisioned yet: `database_id` is a placeholder,
+	// resolvable only against the local binding used by tests and `wrangler dev`.
+	"d1_databases": [
+		{
+			"binding": "DB",
+			"database_name": "fws-2026",
+			"database_id": "00000000-0000-0000-0000-000000000000"
+		}
+	]
+}

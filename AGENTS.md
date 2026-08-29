@@ -8,7 +8,10 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 pnpm dev       # Start dev server at localhost:4321
 pnpm build     # Build production site to ./dist/
 pnpm preview   # Preview production build locally
+pnpm test      # Build, then run the Vitest suite inside workerd
 ```
+
+`pnpm test` builds first because the suite runs against the built artifact — the same worker and static assets `wrangler deploy` would ship — not the source config. Tests run inside real `workerd` via `@cloudflare/vitest-pool-workers`, with a real local D1 binding, so there is one seam: `SELF.fetch()` against the built worker. See `test/walking-skeleton.test.ts` and `vitest.config.ts`.
 
 When starting the dev server for longer sessions, use background mode:
 
