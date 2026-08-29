@@ -31,3 +31,6 @@ worker-configuration.d.ts
 
 # local D1/KV/etc. state for `wrangler dev` and the test suite
 .wrangler/
+
+# local worktrees
+.claude/
