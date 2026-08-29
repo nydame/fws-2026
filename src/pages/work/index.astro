@@ -1,0 +1,58 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { formatDateRange } from '../../lib/date-range';
+import { compareByOrder } from '../../lib/project-order';
+
+const projects = await getCollection('projects', ({ data }) => !data.draft);
+
+const currentWork = projects.filter((project) => project.data.era === 'current').sort(compareByOrder);
+const earlierWork = projects.filter((project) => project.data.era === 'earlier').sort(compareByOrder);
+
+const yearOnly = new Intl.DateTimeFormat('en-US', { year: 'numeric' });
+---
+
+<BaseLayout
+	title="Work · Firefly Web Services"
+	description="Services, Current Work, and a decade of Earlier Work for Mission-Driven Organizations."
+>
+	<h1>Work</h1>
+
+	<section aria-labelledby="services-heading">
+		<h2 id="services-heading">Services</h2>
+		<!-- Placeholder services copy; replace with Felicia's own wording. -->
+		<p>
+			Web engineering for Mission-Driven Organizations, from architecture through going live: full-stack
+			development on modern infrastructure that doesn't depend on someone else's abandoned server.
+		</p>
+	</section>
+
+	<section aria-labelledby="current-work-heading">
+		<h2 id="current-work-heading">Current Work</h2>
+		<ul>
+			{
+				currentWork.map((project) => (
+					<li>
+						<a href={`/work/${project.id}/`}>{project.data.title}</a>
+						<p>{project.data.summary}</p>
+						<p>{formatDateRange(project.data)}</p>
+					</li>
+				))
+			}
+		</ul>
+	</section>
+
+	<section aria-labelledby="earlier-work-heading">
+		<h2 id="earlier-work-heading">Earlier Work</h2>
+		<ul>
+			{
+				earlierWork.map((project) => (
+					<li>
+						<span>{yearOnly.format(project.data.startDate)}</span> — <span>{project.data.title}</span>
+						{project.data.client && <span> ({project.data.client})</span>}
+					</li>
+				))
+			}
+		</ul>
+	</section>
+</BaseLayout>

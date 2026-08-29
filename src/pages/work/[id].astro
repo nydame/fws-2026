@@ -1,6 +1,7 @@
 ---
 import { getCollection, render } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import { formatDateRange } from '../../lib/date-range';
 
 export async function getStaticPaths() {
 	const projects = await getCollection(
@@ -18,10 +19,7 @@ const { project } = Astro.props;
 const { data } = project;
 const { Content } = await render(project);
 
-const dateFormat = new Intl.DateTimeFormat('en-US', { month: 'long', year: 'numeric' });
-const dateRange = data.endDate
-	? `${dateFormat.format(data.startDate)} – ${dateFormat.format(data.endDate)}`
-	: dateFormat.format(data.startDate);
+const dateRange = formatDateRange(data);
 ---
 
 <BaseLayout
