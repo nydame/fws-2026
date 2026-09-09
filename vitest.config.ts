@@ -7,6 +7,13 @@ import { defineConfig } from 'vitest/config';
 // the suite exercises the same artifact `wrangler deploy` would ship. Run
 // `pnpm build` before `pnpm test`.
 export default defineConfig({
+	// `exclude` replaces Vitest's defaults rather than extending them, so
+	// node_modules and dist have to be restated. The third entry keeps stale
+	// git worktrees out: Vitest does not read .gitignore, so a worktree's own
+	// copy of test/ is otherwise collected and run against this build's dist.
+	test: {
+		exclude: ['**/node_modules/**', '**/dist/**', '**/.claude/worktrees/**'],
+	},
 	plugins: [
 		cloudflareTest(async () => ({
 			// The site is fully prerendered right now, so the build has no worker
