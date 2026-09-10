@@ -53,11 +53,20 @@ describe('/work/ index', () => {
 		if (titleIsItsOwn) expect(html).not.toContain(escapeHtml(project.title));
 	});
 
-	it.each(publishedEarlier)('renders Earlier Work $slug as a dated row with no link', (project) => {
+	it.each(publishedEarlier)('renders Earlier Work $slug like Current Work, minus the link', (project) => {
 		const earlierWork = sectionLabelled(html, 'earlier-work-heading');
-		expect(earlierWork).toContain(escapeHtml(project.title));
+
+		// Same summary and date as a Current Work entry, but the title is bold
+		// rather than a link, because there is no /work/<slug>/ page to link to.
+		expect(earlierWork).toContain(`<strong>${escapeHtml(project.title)}</strong>`);
+		expect(earlierWork).toContain(escapeHtml(project.summary));
 		expect(earlierWork).toContain(project.startDate.slice(0, 4));
 		expect(earlierWork).not.toContain(`href="${urlFor(project)}"`);
+
+		// The date row credits a named Client, and says nothing when there
+		// isn't one.
+		if (project.client) expect(earlierWork).toContain(` for ${escapeHtml(project.client)}</p>`);
+		else expect(earlierWork).not.toMatch(/ for <\/p>| for \s*<\/p>/);
 	});
 
 	it('states the offer in a Services section, with no standalone /services/ route', async () => {

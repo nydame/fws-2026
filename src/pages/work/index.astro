@@ -8,8 +8,6 @@ const projects = await getCollection('projects', ({ data }) => !data.draft);
 
 const currentWork = projects.filter((project) => project.data.era === 'current').sort(compareByOrder);
 const earlierWork = projects.filter((project) => project.data.era === 'earlier').sort(compareByOrder);
-
-const yearOnly = new Intl.DateTimeFormat('en-US', { year: 'numeric' });
 ---
 
 <BaseLayout
@@ -48,8 +46,14 @@ const yearOnly = new Intl.DateTimeFormat('en-US', { year: 'numeric' });
 			{
 				earlierWork.map((project) => (
 					<li>
-						<span>{yearOnly.format(project.data.startDate)}</span> — <span>{project.data.title}</span>
-						{project.data.client && <span> ({project.data.client})</span>}
+						{/* Same shape as Current Work, but the title is bold rather than a
+						    link: an Earlier Work Project has no /work/<slug>/ page. */}
+						<strong>{project.data.title}</strong>
+						<p>{project.data.summary}</p>
+						{/* Kept on one line: a newline between the expressions would put
+						    whitespace before "for". An unnamed Client appends nothing at
+						    all rather than a stand-in (CONTEXT.md). */}
+						<p>{formatDateRange(project.data)}{project.data.client && ` for ${project.data.client}`}</p>
 					</li>
 				))
 			}
