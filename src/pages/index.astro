@@ -1,11 +1,88 @@
 ---
+import { getCollection } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
+import { compareByOrder } from '../lib/project-order';
+
+// The shop window is content, not code: which Projects appear here and in
+// what order is decided entirely by the `featured` and `order` keys in the
+// Markdown frontmatter, so Felicia rearranges it by editing content (spec #1,
+// user story 33). Nothing on this page names a Project.
+const featured = (
+	await getCollection(
+		'projects',
+		({ data }) => data.featured && !data.draft && data.era === 'current',
+	)
+).sort(compareByOrder);
 ---
 
 <BaseLayout
 	title="Firefly Web Services"
-	description="Web engineering for mission-driven organizations."
+	description="Web engineering for Mission-Driven Organizations — nonprofits, unions, labs, arts groups, and civic projects."
 >
-	<h1>Firefly Web Services</h1>
-	<p>Web engineering for mission-driven organizations.</p>
+	<section class="hero" aria-labelledby="hero-heading">
+		<h1 id="hero-heading">On the web there are no roads. You can go anywhere.</h1>
+		{/* The 2016 tagline, carried over near-verbatim: the one piece of
+		    established personality the old site had that was worth keeping. */}
+		<p class="tagline">But what if you need a guide?</p>
+		<p class="lede">
+			I'm Felicia. I build and repair websites for Mission-Driven Organizations — nonprofits,
+			unions, research labs, arts groups, and civic projects. Work that has to last, on budgets
+			that have to be justified.
+		</p>
+		<p class="cta"><a href="/hire/">Start a conversation</a></p>
+	</section>
+
+	<section aria-labelledby="featured-work-heading">
+		<h2 id="featured-work-heading">Selected work</h2>
+		<ul>
+			{
+				featured.map((project) => (
+					<li>
+						<a href={`/work/${project.id}/`}>{project.data.title}</a>
+						<p>{project.data.summary}</p>
+					</li>
+				))
+			}
+		</ul>
+		<p><a href="/work/">See all of the work</a></p>
+	</section>
 </BaseLayout>
+
+<script>
+	// Legacy query-string shim for 2016 bookmarks and backlinks. Every one of
+	// those URLs is the site root with a query string, so they all land here —
+	// see src/lib/legacy-query-routes.ts for why this cannot be a redirect.
+	//
+	// Bundled rather than inlined so the route table has exactly one
+	// definition, which the test suite covers directly. The cost is that this
+	// runs after parse, so a legacy arrival sees this page briefly first.
+	import { legacyRouteFor } from '../lib/legacy-query-routes';
+
+	const target = legacyRouteFor(window.location.search);
+
+	// `?index` resolves to this page: going nowhere is the correct outcome,
+	// and guarding on it keeps the shim from navigating to itself.
+	if (target && target !== window.location.pathname) {
+		// `replace` keeps the dead 2016 URL out of the visitor's back button.
+		window.location.replace(target);
+	}
+</script>
+
+<style>
+	.hero {
+		padding: 3rem 1rem;
+	}
+
+	.hero h1 {
+		margin: 0;
+		max-width: 20ch;
+	}
+
+	.tagline {
+		font-style: italic;
+	}
+
+	.lede {
+		max-width: 60ch;
+	}
+</style>

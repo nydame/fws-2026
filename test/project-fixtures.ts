@@ -24,6 +24,8 @@ export interface Project {
 	summary: string;
 	startDate: string;
 	era: 'current' | 'earlier';
+	/** Selects the Project onto the home page's shop window. */
+	featured: boolean;
 	order: number;
 	draft: boolean;
 }
@@ -87,8 +89,11 @@ function toProject(path: string, raw: string): Project {
 		summary: requireString(fields, 'summary', path),
 		startDate: requireString(fields, 'startDate', path),
 		era,
+		// `featured` and `draft` both default to false in the Zod schema, so an
+		// absent key is a legitimate `false` rather than a malformed file.
+		featured: fields.featured === 'true',
 		order: Number(requireString(fields, 'order', path)),
-		draft: requireString(fields, 'draft', path) === 'true',
+		draft: fields.draft === 'true',
 	};
 }
 
@@ -104,6 +109,16 @@ export const publishedCurrent = allProjects.filter((p) => p.era === 'current' &&
 export const publishedEarlier = allProjects.filter((p) => p.era === 'earlier' && !p.draft);
 /** Every Project the build renders somewhere on /work/. */
 export const publishedProjects = allProjects.filter((p) => !p.draft);
+/**
+ * The home page's shop window, in the order the home page renders it.
+ *
+ * Mirrors index.astro's own filter, `era` included: featuring an Earlier
+ * Work Project would otherwise make the suite demand a `/work/<slug>/` link
+ * for a Project that deliberately has no page.
+ */
+export const featuredProjects = publishedCurrent.filter((p) => p.featured);
+/** Published Current Work the home page deliberately leaves off. */
+export const unfeaturedCurrent = publishedCurrent.filter((p) => !p.featured);
 /** Must not appear anywhere in the build. */
 export const draftProjects = allProjects.filter((p) => p.draft);
 /** No Earlier Work Project gets a page, draft or not. */
