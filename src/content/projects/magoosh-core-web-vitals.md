@@ -1,5 +1,5 @@
 ---
-title: "A Performance Audie and Overhaul for an Ed-tech Start-up"
+title: "A Performance Audit and Overhaul for an Ed-tech Start-up"
 client: "Magoosh"
 summary: "Their homepage is the sales funnel for the entire business, but it was underperforming due to sluggish page loading. After I replaced their expensive optimization plugin with Cloudflare and standard best practices, the page loaded 4x as fast as before."
 startDate: 2022-04-01
