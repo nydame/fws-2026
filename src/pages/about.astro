@@ -1,0 +1,64 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+// DRAFT COPY — structure and constraints are settled; the wording is not.
+// Everything below is grounded in CONTEXT.md, the positioning decision, and
+// the Clients named in src/content/projects/. Nothing here is invented
+// biography, because there are no notes for this page yet. Felicia rewrites
+// it in her own voice; the tests guard the constraints, not the sentences.
+//
+// What the 2016 page did that this one must not (issue #7): a three-question
+// Q&A, a published $75/hour rate, and an answer stating the site was built
+// with Pico — false the moment it was migrated.
+---
+
+<BaseLayout
+	title="About · Firefly Web Services"
+	description="Felicia Betancourt — a solo web engineer working with nonprofits, unions, research labs, arts groups, and civic projects."
+>
+	<h1>Hello — I'm Felicia.</h1>
+
+	<p>
+		I'm a web engineer, and Firefly Web Services is the name I practice under. It's a shingle
+		over a one-person shop, not an agency: when you hire Firefly, I am who you get, start to
+		finish.
+	</p>
+
+	<section aria-labelledby="who-heading">
+		<h2 id="who-heading">Who I work with</h2>
+		<p>
+			Mission-Driven Organizations, mostly — nonprofits, unions, research labs, arts groups,
+			and civic projects. An animal shelter whose adoption listings had to stay accurate
+			without doubling anyone's data entry. An electrical workers' union that needed a site
+			its members could read on a phone. A sacred arts organization selling work online. And,
+			as a volunteer since 2015, a city budget made legible to the people it belongs to.
+		</p>
+		<p>
+			That's a deliberate choice rather than an accident of who called. These organizations
+			tend to have real constraints — a budget that has to be justified to a board, a staff
+			with no one whose job is the website, a timeline set by a grant. I'd rather do careful
+			work inside those constraints than pretend they don't exist.
+		</p>
+	</section>
+
+	<section aria-labelledby="how-heading">
+		<h2 id="how-heading">How I work</h2>
+		<p>
+			A good deal of what I build is WordPress, because that is where these organizations
+			already are, and moving a working site off a platform the staff understands is rarely
+			the favor it appears to be. When something else fits better — a static build, a small
+			service, a data pipeline between two systems that were never meant to talk — I'll say
+			so, and say why.
+		</p>
+		<p>
+			I try to leave things better documented than I found them, and to hand back something
+			maintainable by whoever comes next, including the version of you who has forgotten why
+			any of it works that way. Accessibility and performance aren't a separate line item
+			here; a site that's slow on a phone or unusable with a keyboard isn't finished.
+		</p>
+	</section>
+
+	<p>
+		If any of that sounds like what you need, <a href="/hire/">tell me about your project</a>.
+	</p>
+</BaseLayout>
