@@ -1,5 +1,7 @@
 # build output
 dist/
+# the test suite's fixture-Post builds (see vitest.config.ts)
+dist-blog-*/
 # generated types
 .astro/
 

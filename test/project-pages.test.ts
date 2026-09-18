@@ -1,6 +1,7 @@
 import { SELF } from 'cloudflare:test';
 import { describe, expect, it } from 'vitest';
-import { draftProjects, earlierProjects, escapeHtml, publishedCurrent, urlFor } from './project-fixtures';
+import { escapeHtml } from './content-fixtures';
+import { draftProjects, earlierProjects, publishedCurrent, urlFor } from './project-fixtures';
 
 // Wording the site has retired or must never ship, checked on every Project
 // page rather than on one hand-picked example. "case study" is the 2016 site's

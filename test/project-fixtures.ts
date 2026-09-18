@@ -9,6 +9,8 @@
 // `import.meta.glob` is resolved by Vite outside the workerd sandbox the test
 // bodies run in (see all-routes.test.ts), which is what makes the source
 // Markdown reachable from a test that otherwise only has `SELF.fetch()`.
+import { parseFrontmatter, requireString, slugFromPath } from './content-fixtures';
+
 const sources = import.meta.glob('/src/content/projects/*.md', {
 	eager: true,
 	query: '?raw',
@@ -30,52 +32,6 @@ export interface Project {
 	draft: boolean;
 }
 
-const FRONTMATTER = /^---\r?\n([\s\S]*?)\r?\n---/;
-const LIST_ITEM = /^\s+-\s+(.*)$/;
-const FIELD = /^([a-zA-Z]+):\s*(.*)$/;
-
-function unquote(value: string): string {
-	const trimmed = value.trim();
-	const quoted = /^"(.*)"$/.exec(trimmed) ?? /^'(.*)'$/.exec(trimmed);
-	return quoted ? quoted[1] : trimmed;
-}
-
-// Deliberately minimal: the frontmatter shape is fixed by the Zod schema in
-// src/content.config.ts — flat scalars plus one list — so this handles exactly
-// that and throws on anything it does not recognise rather than guessing.
-function parseFrontmatter(raw: string, path: string): Record<string, string | string[]> {
-	const matched = FRONTMATTER.exec(raw);
-	if (!matched) throw new Error(`No frontmatter block in ${path}`);
-
-	const fields: Record<string, string | string[]> = {};
-	let lastKey: string | null = null;
-
-	for (const line of matched[1].split(/\r?\n/)) {
-		if (!line.trim()) continue;
-
-		const item = LIST_ITEM.exec(line);
-		if (item) {
-			if (!lastKey) throw new Error(`List item before any key in ${path}: ${line}`);
-			const existing = fields[lastKey];
-			fields[lastKey] = Array.isArray(existing) ? [...existing, unquote(item[1])] : [unquote(item[1])];
-			continue;
-		}
-
-		const field = FIELD.exec(line);
-		if (!field) throw new Error(`Unparsed frontmatter line in ${path}: ${line}`);
-		lastKey = field[1];
-		fields[lastKey] = unquote(field[2]);
-	}
-
-	return fields;
-}
-
-function requireString(fields: Record<string, string | string[]>, key: string, path: string): string {
-	const value = fields[key];
-	if (typeof value !== 'string' || value === '') throw new Error(`Missing ${key} in ${path}`);
-	return value;
-}
-
 function toProject(path: string, raw: string): Project {
 	const fields = parseFrontmatter(raw, path);
 	const era = requireString(fields, 'era', path);
@@ -83,7 +39,7 @@ function toProject(path: string, raw: string): Project {
 
 	const client = fields.client;
 	return {
-		slug: path.replace(/^.*\//, '').replace(/\.md$/, ''),
+		slug: slugFromPath(path),
 		title: requireString(fields, 'title', path),
 		client: typeof client === 'string' && client !== '' ? client : undefined,
 		summary: requireString(fields, 'summary', path),
@@ -126,21 +82,4 @@ export const earlierProjects = allProjects.filter((p) => p.era === 'earlier');
 
 export function urlFor(project: Project): string {
 	return `/work/${project.slug}/`;
-}
-
-/** Matches Astro's HTML escaping, so expected text can be found in the output. */
-export function escapeHtml(value: string): string {
-	return value
-		.replace(/&/g, '&amp;')
-		.replace(/</g, '&lt;')
-		.replace(/>/g, '&gt;')
-		.replace(/"/g, '&quot;')
-		.replace(/'/g, '&#39;');
-}
-
-/** Narrows an assertion to one `<section aria-labelledby="...">` of a page. */
-export function sectionLabelled(html: string, id: string): string {
-	const matched = new RegExp(`<section aria-labelledby="${id}"[^>]*>([\\s\\S]*?)</section>`).exec(html);
-	if (!matched) throw new Error(`No <section aria-labelledby="${id}"> in the page`);
-	return matched[1];
 }

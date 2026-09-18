@@ -26,4 +26,22 @@ const projects = defineCollection({
 	}),
 });
 
-export const collections = { projects };
+// A Post: a piece of writing published on this site at /blog/ (CONTEXT.md).
+//
+// The blog ships dark — src/content/blog holds no published Post — so the
+// live /blog/ renders its empty state. `BLOG_CONTENT_DIR` points the extra
+// builds in `pnpm test` at fixture Posts instead, so both branches of /blog/
+// are asserted against real built HTML whatever the real content is doing
+// (see vitest.config.ts).
+const blog = defineCollection({
+	loader: glob({ pattern: '**/*.md', base: process.env.BLOG_CONTENT_DIR ?? './src/content/blog' }),
+	schema: z.object({
+		title: z.string(),
+		description: z.string(),
+		pubDate: z.coerce.date(),
+		// A draft Post gets no page and appears in no listing.
+		draft: z.boolean().default(false),
+	}),
+});
+
+export const collections = { projects, blog };

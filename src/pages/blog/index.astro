@@ -1,0 +1,47 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { publishedPosts } from '../../lib/blog-posts';
+import { formatPostDate } from '../../lib/date-range';
+
+// No published Post is not an error state: the blog ships before the writing
+// does, so the page says so warmly and starts listing Posts the moment they
+// exist — no code change (issue #8).
+const posts = publishedPosts(await getCollection('blog'));
+---
+
+<BaseLayout
+	title="Blog · Firefly Web Services"
+	description="Writing about web work for mission-driven organizations: what broke, what it cost, and what I'd do differently."
+>
+	<h1>Blog</h1>
+
+	{
+		posts.length === 0 ? (
+			<section aria-labelledby="no-posts-heading">
+				<h2 id="no-posts-heading">The first Posts are still being written</h2>
+				<p>
+					This is where I'll write about the work itself — what broke, what a migration actually
+					cost, and what I'd do differently next time. Nothing is published here yet.
+				</p>
+				<p>
+					In the meantime, <a href="/work/">the work speaks for itself</a>.
+				</p>
+			</section>
+		) : (
+			<ul>
+				{posts.map((post) => (
+					<li>
+						<a href={`/blog/${post.id}/`}>{post.data.title}</a>
+						<p>{post.data.description}</p>
+						<p>
+							<time datetime={post.data.pubDate.toISOString()}>
+								{formatPostDate(post.data.pubDate)}
+							</time>
+						</p>
+					</li>
+				))}
+			</ul>
+		)
+	}
+</BaseLayout>

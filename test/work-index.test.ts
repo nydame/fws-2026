@@ -1,12 +1,11 @@
 import { SELF } from 'cloudflare:test';
 import { beforeAll, describe, expect, it } from 'vitest';
+import { escapeHtml, sectionLabelled } from './content-fixtures';
 import {
 	draftProjects,
-	escapeHtml,
 	publishedCurrent,
 	publishedEarlier,
 	publishedProjects,
-	sectionLabelled,
 	urlFor,
 } from './project-fixtures';
 

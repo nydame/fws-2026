@@ -1,0 +1,27 @@
+---
+import { getCollection, render } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { publishedPosts } from '../../lib/blog-posts';
+import { formatPostDate } from '../../lib/date-range';
+
+export async function getStaticPaths() {
+	const posts = publishedPosts(await getCollection('blog'));
+
+	return posts.map((post) => ({
+		params: { id: post.id },
+		props: { post },
+	}));
+}
+
+const { post } = Astro.props;
+const { data } = post;
+const { Content } = await render(post);
+---
+
+<BaseLayout title={`${data.title} · Firefly Web Services`} description={data.description}>
+	<h1>{data.title}</h1>
+	<p>
+		<time datetime={data.pubDate.toISOString()}>{formatPostDate(data.pubDate)}</time>
+	</p>
+	<Content />
+</BaseLayout>

@@ -1,13 +1,7 @@
 import { SELF } from 'cloudflare:test';
 import { beforeAll, describe, expect, it } from 'vitest';
-import {
-	escapeHtml,
-	featuredProjects,
-	publishedProjects,
-	sectionLabelled,
-	unfeaturedCurrent,
-	urlFor,
-} from './project-fixtures';
+import { escapeHtml, sectionLabelled } from './content-fixtures';
+import { featuredProjects, publishedProjects, unfeaturedCurrent, urlFor } from './project-fixtures';
 
 // Read outside the workerd sandbox, so the test can assert on what the page
 // is *written* as and not only on what it renders — which is how "no Project
