@@ -1,0 +1,7 @@
+# Copy to .dev.vars for local development. .dev.vars is gitignored.
+#
+# Cloudflare's published always-pass Turnstile test secret: it accepts the
+# dummy token the test site key's widget produces, and nothing else. It is
+# not a credential. The real secret is set only with
+# `wrangler secret put TURNSTILE_SECRET_KEY`.
+TURNSTILE_SECRET_KEY=1x0000000000000000000000000000000AA

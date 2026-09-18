@@ -16,15 +16,17 @@ import InquiryForm from './InquiryForm.astro';
 interface Props {
 	values?: InquiryValues;
 	errors?: FieldErrors;
+	/** The inquiry was valid but Turnstile did not verify it. */
+	turnstileFailed?: boolean;
 	/** The inquiry was valid but could not be stored. */
 	storageFailed?: boolean;
 }
 
-const { values, errors = {}, storageFailed = false } = Astro.props;
+const { values, errors = {}, turnstileFailed = false, storageFailed = false } = Astro.props;
 ---
 
 <BaseLayout
-	title={`${storageFailed || hasErrors(errors) ? 'Error: ' : ''}Hire · Firefly Web Services`}
+	title={`${storageFailed || turnstileFailed || hasErrors(errors) ? 'Error: ' : ''}Hire · Firefly Web Services`}
 	description="How working with me starts, and a short form to tell me what you're working on."
 >
 	<h1>Hire me</h1>
@@ -41,6 +43,16 @@ const { values, errors = {}, storageFailed = false } = Astro.props;
 
 	<section aria-labelledby="inquiry-heading">
 		<h2 id="inquiry-heading">Tell me about your project</h2>
+		{
+			turnstileFailed && (
+				<div role="alert">
+					<p>
+						Your inquiry was <strong>not sent</strong>: I couldn't confirm it came from a person. Nothing you
+						wrote has been lost. Please complete the check below and send it again.
+					</p>
+				</div>
+			)
+		}
 		{
 			storageFailed && (
 				<div role="alert">

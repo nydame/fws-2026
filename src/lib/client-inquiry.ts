@@ -28,20 +28,26 @@ export const MAX_LENGTH: Record<InquiryField, number> = {
 const EMAIL_SHAPE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 /**
- * Reads a Client Inquiry from a form post. A body that isn't form data reads
- * as a blank inquiry, which validation then rejects, rather than a crash.
+ * Reads a form post's body once, for both the Client Inquiry and the
+ * Turnstile token. A body that isn't form data reads as `null` rather than a
+ * crash.
  */
-export async function readInquiry(request: Request): Promise<InquiryValues> {
-	let form: FormData;
+export async function readForm(request: Request): Promise<FormData | null> {
 	try {
-		form = await request.formData();
+		return await request.formData();
 	} catch {
-		return { ...BLANK_INQUIRY };
+		return null;
 	}
+}
 
+/**
+ * Reads a Client Inquiry from a form post. A missing form reads as a blank
+ * inquiry, which validation then rejects.
+ */
+export function readInquiry(form: FormData | null): InquiryValues {
 	const values = { ...BLANK_INQUIRY };
 	for (const field of INQUIRY_FIELDS) {
-		const value = form.get(field);
+		const value = form?.get(field);
 		values[field] = typeof value === 'string' ? value.trim() : '';
 	}
 	return values;

@@ -17,5 +17,11 @@
 			"database_name": "fws-2026",
 			"database_id": "00000000-0000-0000-0000-000000000000"
 		}
-	]
+	],
+	// Set with `wrangler secret put`, never here: this names the secrets the
+	// Worker needs, so `wrangler types` and `wrangler dev` know about them.
+	// TURNSTILE_SECRET_KEY verifies the Hire page's Turnstile token (issue #10).
+	"secrets": {
+		"required": ["TURNSTILE_SECRET_KEY"]
+	}
 }

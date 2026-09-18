@@ -1,8 +1,9 @@
 import { env, SELF } from 'cloudflare:test';
-import { beforeAll, beforeEach, describe, expect, it } from 'vitest';
+import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import { escapeHtml } from './content-fixtures';
 import { controlNamed, inquiryFormIn, type RenderedForm, renderedValue } from './inquiry-form';
 import { h1Count, h1TextOf } from './page-text';
+import { type SiteverifyCall, siteverifyAnswers, siteverifyIsDown, TOKEN_FIELD } from './turnstile';
 
 // The Client Inquiry endpoint's contract, through the one seam: a request to
 // the built worker, and a real local D1 read back afterwards. The error paths
@@ -39,21 +40,31 @@ beforeAll(async () => {
 	hireForm = inquiryFormIn(await (await SELF.fetch('https://example.com/hire/')).text());
 });
 
+// Every inquiry below is sent by a person unless a test says otherwise:
+// siteverify accepts its token.
+let siteverifyCalls: SiteverifyCall[];
+
 beforeEach(async () => {
 	await env.DB.exec('DELETE FROM client_inquiries');
+	siteverifyCalls = siteverifyAnswers(true);
 });
 
 const SITE = 'https://example.com';
 
+/** What the Turnstile widget puts in the form once it has run. */
+const TOKEN = 'a-token-from-the-widget';
+
 /**
- * Submits the /hire/ form the way a browser without JavaScript does: every
- * field the form names, urlencoded, to the form's own action — with the
+ * Submits the /hire/ form the way a browser does: every field the form names,
+ * urlencoded, to the form's own action, plus the token the Turnstile widget
+ * adds at runtime (`token: null` for a post that has none) — with the
  * `Origin` header a browser always sends on a form post, which Astro's
  * cross-site request check requires.
  */
-function submit(fields: Partial<Fields>, origin = SITE) {
+function submit(fields: Partial<Fields>, { origin = SITE, token = TOKEN as string | null } = {}) {
 	const body = new URLSearchParams();
 	for (const name of hireForm.fieldNames) body.set(name, fields[name as keyof Fields] ?? '');
+	if (token !== null) body.set(TOKEN_FIELD, token);
 
 	return SELF.fetch(new URL(hireForm.action, SITE), {
 		method: hireForm.method.toUpperCase(),
@@ -88,6 +99,13 @@ describe('a valid Client Inquiry', () => {
 		expect(locationPathOf(response)).toBe('/hire/received/');
 	});
 
+	it('is verified with Turnstile, sending the widget\'s token and the Worker secret', async () => {
+		await submit(VALID);
+
+		expect(siteverifyCalls).toHaveLength(1);
+		expect(siteverifyCalls[0]).toMatchObject({ response: TOKEN, secret: 'test-turnstile-secret' });
+	});
+
 	it('leaves exactly one row in D1 with the submitted values', async () => {
 		const before = Date.now();
 		await submit(VALID);
@@ -111,6 +129,59 @@ describe('a valid Client Inquiry', () => {
 		await submit({ ...VALID, name: `  ${VALID.name}  `, email: ` ${VALID.email}\n` });
 
 		expect((await rows())[0]).toMatchObject({ name: VALID.name, email: VALID.email });
+	});
+});
+
+describe('a Client Inquiry that fails the Turnstile check', () => {
+	// Every way the check can fail, each arranged before the Client Inquiry is sent.
+	const failures: [string, () => Promise<Response>][] = [
+		['has no token', () => submit(VALID, { token: null })],
+		['has an empty token', () => submit(VALID, { token: '' })],
+		[
+			'has a token siteverify rejects',
+			() => {
+				siteverifyAnswers(false);
+				return submit(VALID);
+			},
+		],
+		[
+			'cannot reach siteverify',
+			() => {
+				siteverifyIsDown();
+				return submit(VALID);
+			},
+		],
+	];
+
+	it.each(failures)('that %s is rejected and writes no row', async (_, send) => {
+		const response = await send();
+
+		expect(response.status).toBe(403);
+		expect(response.headers.get('location')).toBeNull();
+		expect(await rows()).toEqual([]);
+	});
+
+	it.each(failures)('that %s says so on a whole page, and keeps what was written', async (_, send) => {
+		const page = await (await send()).text();
+
+		expect(h1Count(page)).toBe(1);
+		expect(page).toMatch(/role="alert"/);
+		expectValuesPreserved(page, VALID);
+	});
+
+	// A bot learns nothing about which part of the check it failed: every
+	// failure gets the same response, and none names siteverify's reason.
+	it('gets the same response whatever the reason', async () => {
+		const pages = [];
+		for (const [, send] of failures) {
+			const response = await send();
+			pages.push({ status: response.status, body: await response.text() });
+			vi.restoreAllMocks();
+			siteverifyAnswers(true);
+		}
+
+		for (const page of pages.slice(1)) expect(page).toEqual(pages[0]);
+		expect(pages[0].body).not.toMatch(/invalid-input-response/);
 	});
 });
 
@@ -218,7 +289,7 @@ describe('the endpoint outside a form post', () => {
 	// Astro's `security.checkOrigin`, on by default: another site can't submit
 	// a Client Inquiry through a visitor's browser.
 	it('refuses a form post from another origin and writes no row', async () => {
-		const response = await submit(VALID, 'https://elsewhere.example');
+		const response = await submit(VALID, { origin: 'https://elsewhere.example' });
 
 		expect(response.status).toBe(403);
 		expect(await rows()).toEqual([]);

@@ -36,3 +36,8 @@ worker-configuration.d.ts
 
 # local worktrees
 .claude/
+
+# Worker secrets for `astro dev` / `wrangler dev`; see .dev.vars.example
+.dev.vars
+.dev.vars.*
+!.dev.vars.example

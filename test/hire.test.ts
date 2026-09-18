@@ -55,12 +55,28 @@ describe('/hire/', () => {
 		expect(html).toMatch(new RegExp(`<label[^>]*\\bfor="${id}"`));
 	});
 
-	// A form that only works once a script runs fails the people least likely
-	// to have one running. The inquiry tests submit this form's own fields as a
-	// plain urlencoded POST, which is what a browser without JavaScript sends.
-	it('does not depend on a script to submit', () => {
-		expect(mainOf(html)).not.toMatch(/<script\b/i);
+	// Turnstile needs JavaScript to produce a token, so the form can no longer
+	// be sent without it (issue #10 overrides #9 here). It is still a plain
+	// form post: the one script on the page is Turnstile's, which only adds a
+	// field, and nothing intercepts the submission.
+	it('renders a Turnstile widget with a site key inside the form', () => {
+		const form = inquiryFormIn(html).html;
+
+		expect(form).toMatch(/<div\b[^>]*\bclass="cf-turnstile"[^>]*\bdata-sitekey="[^"]+"/);
+	});
+
+	it('loads Turnstile, and no other script', () => {
+		const scripts = [...mainOf(html).matchAll(/<script\b[^>]*>/gi)].map((tag) => /\bsrc="([^"]*)"/.exec(tag[0])?.[1]);
+
+		expect(scripts).toEqual(['https://challenges.cloudflare.com/turnstile/v0/api.js']);
+	});
+
+	it('submits as a plain form post, with no script handling it', () => {
 		expect(inquiryFormIn(html).html).not.toMatch(/\bon[a-z]+=/i);
+	});
+
+	it('tells a visitor without JavaScript why the form will not send', () => {
+		expect(inquiryFormIn(html).html).toMatch(/<noscript>[\s\S]*?\S[\s\S]*?<\/noscript>/);
 	});
 
 	it('found the built pages to sweep', () => {

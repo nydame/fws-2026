@@ -7,6 +7,7 @@ import {
 	type InquiryValues,
 	MAX_LENGTH,
 } from '../lib/client-inquiry';
+import { SITE_KEY } from '../lib/turnstile';
 
 interface Props {
 	/** What the Prospective Client already wrote, so nothing is retyped. */
@@ -16,8 +17,10 @@ interface Props {
 
 const { values = BLANK_INQUIRY, errors = {} } = Astro.props;
 
-// A plain HTML form post: it works with JavaScript disabled, and nothing may
-// ever make it depend on a script (issue #9).
+// A plain HTML form post, with no script intercepting it. It needs
+// JavaScript for one thing only: the Turnstile widget, which adds the token
+// the endpoint verifies before storing anything (issue #10). Without it the
+// form can't be sent, and the <noscript> note below says so.
 const CONTROLS: Record<InquiryField, { label: string; type?: 'text' | 'email'; autocomplete?: string; required: boolean }> = {
 	name: { label: 'Your name*', type: 'text', autocomplete: 'name', required: true },
 	email: { label: 'Your email address*', type: 'email', autocomplete: 'email', required: true },
@@ -80,6 +83,12 @@ const invalidFields = INQUIRY_FIELDS.filter((field) => errors[field]);
 			);
 		})
 	}
+
+	<noscript>
+		<p>This form checks that you're a person before sending, and that check needs JavaScript. Please turn it on to send your inquiry.</p>
+	</noscript>
+	<div class="cf-turnstile" data-sitekey={SITE_KEY}></div>
+	<script is:inline src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 
 	<p>
 		<button type="submit">Send</button>

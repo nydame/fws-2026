@@ -26,8 +26,14 @@ function builtSite(name: string, distDir: string, include: string[]) {
 		plugins: [
 			cloudflareTest(async () => ({
 				wrangler: { configPath: `${distDir}/server/wrangler.json` },
-				// Applied to the local D1 by test/apply-migrations.ts.
-				miniflare: { bindings: { TEST_MIGRATIONS: await readD1Migrations(resolve('./migrations')) } },
+				miniflare: {
+					bindings: {
+						// Applied to the local D1 by test/apply-migrations.ts.
+						TEST_MIGRATIONS: await readD1Migrations(resolve('./migrations')),
+						// Never sent anywhere: test/turnstile.ts answers siteverify itself.
+						TURNSTILE_SECRET_KEY: 'test-turnstile-secret',
+					},
+				},
 			})),
 		],
 	});
