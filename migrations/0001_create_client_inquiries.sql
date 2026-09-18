@@ -11,8 +11,9 @@ CREATE TABLE client_inquiries (
 	-- NULL when the Prospective Client left it blank.
 	organization TEXT,
 	message TEXT NOT NULL,
-	-- Nothing sends a notification yet (issue #11), so every row starts
-	-- pending; `failed` marks one that needs retrying or noticing by hand.
+	-- `pending` until the notification has been attempted (the row is
+	-- written first); `failed` marks one that needs retrying or noticing by
+	-- hand.
 	notification_status TEXT NOT NULL DEFAULT 'pending'
 		CHECK (notification_status IN ('pending', 'sent', 'failed'))
 );

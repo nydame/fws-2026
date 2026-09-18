@@ -32,6 +32,10 @@ function builtSite(name: string, distDir: string, include: string[]) {
 						TEST_MIGRATIONS: await readD1Migrations(resolve('./migrations')),
 						// Never sent anywhere: test/turnstile.ts answers siteverify itself.
 						TURNSTILE_SECRET_KEY: 'test-turnstile-secret',
+						// Never sent anywhere either: test/resend.ts answers Resend itself.
+						RESEND_API_KEY: 'test-resend-key',
+						INQUIRY_NOTIFICATION_FROM: 'Inquiries <inquiries@example.com>',
+						INQUIRY_NOTIFICATION_TO: 'practitioner@example.com',
 					},
 				},
 			})),

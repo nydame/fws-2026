@@ -2,13 +2,15 @@
 import { env } from 'cloudflare:workers';
 import HirePage from '../../components/HirePage.astro';
 import { hasErrors, readForm, readInquiry, storeInquiry, validateInquiry } from '../../lib/client-inquiry';
+import { notifyOfInquiry } from '../../lib/inquiry-notification';
 import { verifyTurnstile } from '../../lib/turnstile';
 
 // The one route in the site that is not prerendered: it receives a Client
 // Inquiry (docs/adr/0001-client-inquiry-pipeline.md). Each outcome is a
 // response a Prospective Client can trust:
 //
-//   - stored:            303 to /hire/received/, which says so plainly
+//   - stored:            303 to /hire/received/, which says so plainly,
+//                        whether or not the notification then went out
 //   - invalid:           422, the Hire page again with field-level messages
 //   - failed Turnstile:  403, the Hire page again, not saying why
 //   - storage failed:    500, the Hire page again with an honest error
@@ -21,7 +23,9 @@ import { verifyTurnstile } from '../../lib/turnstile';
 // never spends a siteverify call, and before storage, so nothing unverified
 // is ever written.
 //
-// NOT YET THE WHOLE ADR: notifying by Resend after the write is issue #11.
+// The practitioner is notified through Resend only after the row is written,
+// so a failed notification never costs an inquiry: the row stays, marked
+// `failed`, and the Prospective Client is still told it was received.
 export const prerender = false;
 
 // Nothing to receive outside a form post; send a stray visit to the form.
@@ -32,6 +36,7 @@ const values = readInquiry(form);
 const errors = validateInquiry(values);
 let turnstileFailed = false;
 let storageFailed = false;
+let inquiryId: number | undefined;
 
 if (!hasErrors(errors)) {
 	turnstileFailed = !(await verifyTurnstile(form, env.TURNSTILE_SECRET_KEY));
@@ -39,13 +44,17 @@ if (!hasErrors(errors)) {
 
 if (!hasErrors(errors) && !turnstileFailed) {
 	try {
-		await storeInquiry(env.DB, values);
-		return Astro.redirect('/hire/received/', 303);
+		inquiryId = await storeInquiry(env.DB, values);
 	} catch (error) {
 		// Logs the failure, never the inquiry: its contents are personal data.
 		console.error('A valid Client Inquiry could not be stored:', error);
 		storageFailed = true;
 	}
+}
+
+if (inquiryId !== undefined) {
+	await notifyOfInquiry(env.DB, env, inquiryId, values);
+	return Astro.redirect('/hire/received/', 303);
 }
 
 Astro.response.status = storageFailed ? 500 : turnstileFailed ? 403 : 422;

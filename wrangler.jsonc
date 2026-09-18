@@ -21,7 +21,12 @@
 	// Set with `wrangler secret put`, never here: this names the secrets the
 	// Worker needs, so `wrangler types` and `wrangler dev` know about them.
 	// TURNSTILE_SECRET_KEY verifies the Hire page's Turnstile token (issue #10).
+	// RESEND_API_KEY sends the practitioner a notification of each Client
+	// Inquiry (issue #11), from INQUIRY_NOTIFICATION_FROM — an address on a
+	// domain verified in Resend — to INQUIRY_NOTIFICATION_TO. The two addresses
+	// aren't credentials, but they're set the same way so a personal inbox
+	// never lands in the repo, and so a deploy without them fails loudly.
 	"secrets": {
-		"required": ["TURNSTILE_SECRET_KEY"]
+		"required": ["TURNSTILE_SECRET_KEY", "RESEND_API_KEY", "INQUIRY_NOTIFICATION_FROM", "INQUIRY_NOTIFICATION_TO"]
 	}
 }

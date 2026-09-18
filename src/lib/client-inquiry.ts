@@ -77,14 +77,24 @@ export function hasErrors(errors: FieldErrors): boolean {
 }
 
 /**
- * Stores a validated Client Inquiry. Throws if the row isn't written, so the
- * caller can never mistake a lost inquiry for a stored one.
+ * Stores a validated Client Inquiry and returns its row's id. Throws if the
+ * row isn't written, so the caller can never mistake a lost inquiry for a
+ * stored one.
  */
-export async function storeInquiry(db: D1Database, values: InquiryValues): Promise<void> {
-	await db
+export async function storeInquiry(db: D1Database, values: InquiryValues): Promise<number> {
+	const result = await db
 		.prepare(
 			'INSERT INTO client_inquiries (submitted_at, name, email, organization, message) VALUES (?, ?, ?, ?, ?)',
 		)
 		.bind(new Date().toISOString(), values.name, values.email, values.organization || null, values.message)
 		.run();
+	return result.meta.last_row_id;
+}
+
+/** Whether the practitioner was told about a stored Client Inquiry. */
+export type NotificationStatus = 'sent' | 'failed';
+
+/** Records how the notification of stored Client Inquiry `id` went. */
+export async function recordNotification(db: D1Database, id: number, status: NotificationStatus): Promise<void> {
+	await db.prepare('UPDATE client_inquiries SET notification_status = ? WHERE id = ?').bind(status, id).run();
 }

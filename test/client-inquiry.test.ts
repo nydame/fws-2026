@@ -3,6 +3,7 @@ import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import { escapeHtml } from './content-fixtures';
 import { controlNamed, inquiryFormIn, type RenderedForm, renderedValue } from './inquiry-form';
 import { h1Count, h1TextOf } from './page-text';
+import { type ResendCall, resendAccepts, resendIsDown, resendRefuses } from './resend';
 import { type SiteverifyCall, siteverifyAnswers, siteverifyIsDown, TOKEN_FIELD } from './turnstile';
 
 // The Client Inquiry endpoint's contract, through the one seam: a request to
@@ -40,13 +41,15 @@ beforeAll(async () => {
 	hireForm = inquiryFormIn(await (await SELF.fetch('https://example.com/hire/')).text());
 });
 
-// Every inquiry below is sent by a person unless a test says otherwise:
-// siteverify accepts its token.
+// Every inquiry below is sent by a person, and Resend is up, unless a test
+// says otherwise: siteverify accepts its token and Resend accepts the email.
 let siteverifyCalls: SiteverifyCall[];
+let resendCalls: ResendCall[];
 
 beforeEach(async () => {
 	await env.DB.exec('DELETE FROM client_inquiries');
 	siteverifyCalls = siteverifyAnswers(true);
+	resendCalls = resendAccepts();
 });
 
 const SITE = 'https://example.com';
@@ -112,7 +115,7 @@ describe('a valid Client Inquiry', () => {
 
 		const stored = await rows();
 		expect(stored).toHaveLength(1);
-		expect(stored[0]).toMatchObject({ ...VALID, notification_status: 'pending' });
+		expect(stored[0]).toMatchObject(VALID);
 
 		const submittedAt = Date.parse(stored[0].submitted_at);
 		expect(submittedAt).toBeGreaterThanOrEqual(before - 1000);
@@ -129,6 +132,94 @@ describe('a valid Client Inquiry', () => {
 		await submit({ ...VALID, name: `  ${VALID.name}  `, email: ` ${VALID.email}\n` });
 
 		expect((await rows())[0]).toMatchObject({ name: VALID.name, email: VALID.email });
+	});
+});
+
+describe('the notification of a Client Inquiry', () => {
+	it('is sent exactly once, through Resend, with the Worker secret', async () => {
+		await submit(VALID);
+
+		expect(resendCalls).toHaveLength(1);
+		expect(resendCalls[0].authorization).toBe('Bearer test-resend-key');
+	});
+
+	it('is attempted only once the row is in D1', async () => {
+		await submit(VALID);
+
+		expect(resendCalls[0].rowsAtCallTime).toBe(1);
+	});
+
+	it('goes to the practitioner, from the configured sender', async () => {
+		await submit(VALID);
+
+		const { email } = resendCalls[0];
+		expect([email.to].flat()).toEqual(['practitioner@example.com']);
+		expect(email.from).toBe('Inquiries <inquiries@example.com>');
+	});
+
+	it('says who wrote, from which organization, and what they said', async () => {
+		await submit(VALID);
+
+		const { email } = resendCalls[0];
+		expect(email.subject).toContain(VALID.name);
+		for (const value of Object.values(VALID)) expect(email.text).toContain(value);
+	});
+
+	it('can be answered with a plain reply', async () => {
+		await submit(VALID);
+
+		expect([resendCalls[0].email.reply_to].flat()).toEqual([VALID.email]);
+	});
+
+	it('says so when no organization was given, rather than leaving a blank', async () => {
+		await submit({ ...VALID, organization: '' });
+
+		expect(resendCalls[0].email.text).toMatch(/organi[sz]ation:\s*\(none given\)/i);
+	});
+
+	// A line break in a name would otherwise land in the subject line.
+	it('keeps the subject to one line', async () => {
+		await submit({ ...VALID, name: 'Ada\r\nOkafor' });
+
+		expect(resendCalls[0].email.subject).not.toMatch(/[\r\n]/);
+	});
+
+	it('marks the row as notified once Resend accepts it', async () => {
+		await submit(VALID);
+
+		expect((await rows())[0].notification_status).toBe('sent');
+	});
+
+	it('is never attempted for an inquiry that was not stored', async () => {
+		await submit({ ...VALID, email: '' });
+		await submit(VALID, { token: null });
+
+		expect(resendCalls).toEqual([]);
+	});
+});
+
+describe('a notification that fails', () => {
+	const failures: [string, () => void][] = [
+		['Resend refuses it', () => resendRefuses(500)],
+		['Resend rejects the request', () => resendRefuses(422)],
+		['Resend cannot be reached', () => resendIsDown()],
+	];
+
+	it.each(failures)('when %s, leaves the row stored and marked unnotified', async (_, arrange) => {
+		arrange();
+		await submit(VALID);
+
+		const stored = await rows();
+		expect(stored).toHaveLength(1);
+		expect(stored[0]).toMatchObject({ ...VALID, notification_status: 'failed' });
+	});
+
+	it.each(failures)('when %s, still tells the Prospective Client the inquiry was received', async (_, arrange) => {
+		arrange();
+		const response = await submit(VALID);
+
+		expect(response.status).toBe(303);
+		expect(locationPathOf(response)).toBe('/hire/received/');
 	});
 });
 
