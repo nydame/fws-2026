@@ -1,0 +1,57 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { type FieldErrors, hasErrors, type InquiryValues } from '../lib/client-inquiry';
+import InquiryForm from './InquiryForm.astro';
+
+// DRAFT COPY — structure and constraints are settled; the wording is not.
+// Felicia rewrites it in her own voice, as with the About page. Two lines
+// here are promises only she can make and must confirm or cut: the written
+// proposal, and replying personally by email. No rate, no email address, and
+// no "we" — the tests guard those, not the sentences.
+
+// The Hire page, rendered two ways: prerendered at /hire/, and by the Client
+// Inquiry endpoint when a Client Inquiry has to come back to the Prospective
+// Client — with its errors, and with everything they wrote still in place.
+
+interface Props {
+	values?: InquiryValues;
+	errors?: FieldErrors;
+	/** The inquiry was valid but could not be stored. */
+	storageFailed?: boolean;
+}
+
+const { values, errors = {}, storageFailed = false } = Astro.props;
+---
+
+<BaseLayout
+	title={`${storageFailed || hasErrors(errors) ? 'Error: ' : ''}Hire · Firefly Web Services`}
+	description="How working with me starts, and a short form to tell me what you're working on."
+>
+	<h1>Hire me</h1>
+
+	<section aria-labelledby="engagement-heading">
+		<h2 id="engagement-heading">What working together looks like</h2>
+		<p>
+    You'll work with me directly, from the first conversation to the day your project ships. Together we'll figure out the scope, budget, timeline, etc. that works for you. 
+    Before the real work starts, I'll provide you with a proposal, or product requirements document (PRD) for larger projects.
+    Equally important is our agreement on how we'll communicate, and how often. If you decide to go forward, that's when I get to work. You'll be invoiced
+    every month, or at the end of the project if it's a small one.
+		</p>
+	</section>
+
+	<section aria-labelledby="inquiry-heading">
+		<h2 id="inquiry-heading">Tell me about your project</h2>
+		{
+			storageFailed && (
+				<div role="alert">
+					<p>
+						Your inquiry was <strong>not sent</strong>. Something went wrong on my end while saving it.
+						Nothing you wrote has been lost: it's all still below, so please try sending it again in a few
+						minutes.
+					</p>
+				</div>
+			)
+		}
+		<InquiryForm values={values} errors={errors} />
+	</section>
+</BaseLayout>

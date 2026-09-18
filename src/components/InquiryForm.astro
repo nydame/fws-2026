@@ -1,0 +1,100 @@
+---
+import {
+	BLANK_INQUIRY,
+	type FieldErrors,
+	INQUIRY_FIELDS,
+	type InquiryField,
+	type InquiryValues,
+	MAX_LENGTH,
+} from '../lib/client-inquiry';
+
+interface Props {
+	/** What the Prospective Client already wrote, so nothing is retyped. */
+	values?: InquiryValues;
+	errors?: FieldErrors;
+}
+
+const { values = BLANK_INQUIRY, errors = {} } = Astro.props;
+
+// A plain HTML form post: it works with JavaScript disabled, and nothing may
+// ever make it depend on a script (issue #9).
+const CONTROLS: Record<InquiryField, { label: string; type?: 'text' | 'email'; autocomplete?: string; required: boolean }> = {
+	name: { label: 'Your name*', type: 'text', autocomplete: 'name', required: true },
+	email: { label: 'Your email address*', type: 'email', autocomplete: 'email', required: true },
+	organization: { label: 'Your organization (optional)', type: 'text', autocomplete: 'organization', required: false },
+	// No `type`: the message is a textarea.
+	message: { label: 'What are you working on?*', required: true },
+};
+
+const idOf = (field: InquiryField) => `inquiry-${field}`;
+const errorIdOf = (field: InquiryField) => `inquiry-${field}-error`;
+
+const invalidFields = INQUIRY_FIELDS.filter((field) => errors[field]);
+---
+
+<form method="post" action="/hire/inquiry/">
+	{
+		invalidFields.length > 0 && (
+			<div role="alert" class="summary">
+				<p>Something needs fixing before I can receive this:</p>
+				<ul>
+					{invalidFields.map((field) => (
+						<li>
+							<a href={`#${idOf(field)}`}>{errors[field]}</a>
+						</li>
+					))}
+				</ul>
+			</div>
+		)
+	}
+
+	{
+		INQUIRY_FIELDS.map((field) => {
+			const { label, type, autocomplete, required } = CONTROLS[field];
+			// An invalid field is marked and linked to its message; a valid one
+			// carries neither attribute.
+			const attributes = {
+				id: idOf(field),
+				name: field,
+				autocomplete,
+				required,
+				maxlength: MAX_LENGTH[field],
+				...(errors[field] && { 'aria-invalid': 'true', 'aria-describedby': errorIdOf(field) }),
+			};
+
+			return (
+				<p>
+					<label for={idOf(field)}>{label}</label>
+					{errors[field] && (
+						<span id={errorIdOf(field)} class="field-error">
+							{errors[field]}
+						</span>
+					)}
+					{/* The textarea stays on one line: whitespace inside it is part of its value. */}
+					{type ? (
+						<input type={type} value={values[field]} {...attributes} />
+					) : (
+						<textarea rows="8" {...attributes}>{values[field]}</textarea>
+					)}
+				</p>
+			);
+		})
+	}
+
+	<p>
+		<button type="submit">Send</button>
+	</p>
+</form>
+
+<style>
+	label,
+	.field-error {
+		display: block;
+	}
+
+	input,
+	textarea {
+		width: 100%;
+		max-width: 40rem;
+	}
+</style>

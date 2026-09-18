@@ -1,0 +1,45 @@
+---
+import { env } from 'cloudflare:workers';
+import HirePage from '../../components/HirePage.astro';
+import { hasErrors, readInquiry, storeInquiry, validateInquiry } from '../../lib/client-inquiry';
+
+// The one route in the site that is not prerendered: it receives a Client
+// Inquiry (docs/adr/0001-client-inquiry-pipeline.md). Each outcome is a
+// response a Prospective Client can trust:
+//
+//   - stored:         303 to /hire/received/, which says so plainly
+//   - invalid:        422, the Hire page again with field-level messages
+//   - storage failed: 500, the Hire page again with an honest error
+//
+// Both error responses carry everything the Prospective Client wrote, so
+// nothing is retyped, and neither ever writes a row or claims success. They
+// render HTML, which is why this is a page rather than a `.ts` endpoint.
+//
+// NOT YET THE WHOLE ADR. Two steps it requires are their own tickets:
+// verifying a Turnstile token before the write (issue #10), and notifying by
+// Resend after it (issue #11). Until #10 lands this is an unauthenticated
+// write path into D1, and must not be deployed anywhere public.
+export const prerender = false;
+
+// Nothing to receive outside a form post; send a stray visit to the form.
+if (Astro.request.method !== 'POST') return Astro.redirect('/hire/', 303);
+
+const values = await readInquiry(Astro.request);
+const errors = validateInquiry(values);
+let storageFailed = false;
+
+if (!hasErrors(errors)) {
+	try {
+		await storeInquiry(env.DB, values);
+		return Astro.redirect('/hire/received/', 303);
+	} catch (error) {
+		// Logs the failure, never the inquiry: its contents are personal data.
+		console.error('A valid Client Inquiry could not be stored:', error);
+		storageFailed = true;
+	}
+}
+
+Astro.response.status = storageFailed ? 500 : 422;
+---
+
+<HirePage values={values} errors={errors} storageFailed={storageFailed} />

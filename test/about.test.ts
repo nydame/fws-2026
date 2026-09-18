@@ -1,5 +1,6 @@
 import { SELF } from 'cloudflare:test';
 import { beforeAll, describe, expect, it } from 'vitest';
+import { expectFirstPersonSingular, expectNoRate, h1Count, mainOf, publishedText, textOf } from './page-text';
 
 // The About page is mostly prose, and prose assertions are churn (see the
 // spec's testing decisions). So nothing here asserts on wording: these are
@@ -14,21 +15,8 @@ let main: string;
 
 beforeAll(async () => {
 	html = await (await SELF.fetch('https://example.com/about/')).text();
-
-	const matched = /<main[^>]*>([\s\S]*?)<\/main>/.exec(html);
-	if (!matched) throw new Error('No <main> in /about/');
-	main = matched[1];
+	main = mainOf(html);
 });
-
-function textOf(fragment: string): string {
-	return fragment.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ');
-}
-
-/** The rendered prose plus the metadata that gets published alongside it. */
-function publishedText(): string {
-	const meta = [...html.matchAll(/<meta[^>]+content="([^"]*)"/gi)].map((m) => m[1]).join(' ');
-	return `${textOf(main)} ${meta}`;
-}
 
 function sentences(text: string): string[] {
 	return text.split(/(?<=[.!?])\s+/);
@@ -39,7 +27,7 @@ describe('/about/', () => {
 		const response = await SELF.fetch('https://example.com/about/');
 
 		expect(response.status).toBe(200);
-		expect((html.match(/<h1[\s>]/gi) ?? []).length).toBe(1);
+		expect(h1Count(html)).toBe(1);
 	});
 
 	// The 2016 page was three Q&A articles. A question used as a label is the
@@ -61,22 +49,13 @@ describe('/about/', () => {
 	// practice: "we" describing a Client engagement is ordinary English and
 	// the acceptance criterion does not forbid it.
 	it('never speaks for the practice in the first person plural', () => {
-		const text = textOf(main);
-
-		expect(text).toMatch(/\bI\b/);
-		expect(text).not.toMatch(/\bwe(?:'re| are)\s+(?:a|an|the)\b/i);
-		expect(text).not.toMatch(/\bwe\s+(?:build|make|design|offer|provide|deliver|specialize)\b/i);
-		expect(text).not.toMatch(/\bour\s+(?:team|clients?|work|services?|process|rates?|practice)\b/i);
-		expect(text).not.toMatch(/\b(?:contact|hire|email|about)\s+us\b/i);
+		expectFirstPersonSingular(textOf(main));
 	});
 
 	// The 2016 page published $75/hour. A rate on a page is a promise that
 	// ages badly and prices the work before the conversation.
 	it('publishes no rate', () => {
-		const text = publishedText();
-
-		expect(text).not.toMatch(/\$\s*\d/);
-		expect(text).not.toMatch(/\b\d+\s*(?:\/|per\s+|an?\s+)(?:hour|hr|day)\b/i);
+		expectNoRate(publishedText(html));
 	});
 
 	// The 2016 page's third answer said the site was built with Pico, which
@@ -88,19 +67,19 @@ describe('/about/', () => {
 			/\b(?:this (?:site|page|website)|the (?:site|page) you(?:'re| are) reading|my own site|firefly'?s own site|go-firefly\.com)\b/i;
 		const STACK = /\b(?:Pico|Astro|Cloudflare|WordPress|Netlify|Vercel|Jekyll|Hugo|Eleventy)\b/i;
 
-		const selfReferentialStackClaims = sentences(publishedText()).filter(
+		const selfReferentialStackClaims = sentences(publishedText(html)).filter(
 			(sentence) => SELF_REFERENCE.test(sentence) && STACK.test(sentence),
 		);
 
 		expect(selfReferentialStackClaims).toEqual([]);
 		// Named outright because it is the claim that actually went stale.
-		expect(publishedText()).not.toMatch(/\bPico\b/i);
+		expect(publishedText(html)).not.toMatch(/\bPico\b/i);
 	});
 
 	// A sample of CONTEXT.md's _Avoid_ list: the terms that are wrong wherever
 	// they appear, rather than the ones that depend on what they refer to.
 	it('avoids the retired terms from CONTEXT.md', () => {
-		const text = publishedText();
+		const text = publishedText(html);
 
 		for (const term of [
 			/case stud(?:y|ies)/i,
