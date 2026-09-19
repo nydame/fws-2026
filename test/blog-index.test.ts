@@ -8,7 +8,7 @@ import { BLOG_LINK, escapeHtml, navMarkup } from './content-fixtures';
 const published = publishedIn(sitePosts);
 const drafts = draftsIn(sitePosts);
 
-// Every page the build produced, so "nothing links to the blog" is checked
+// Every page the build produced, so the blog's navigation link is checked
 // site-wide rather than on one hand-picked page. Resolved by Vite outside the
 // workerd sandbox, like all-routes.test.ts.
 const builtPages = import.meta.glob('/dist/client/**/*.html', {
@@ -50,7 +50,9 @@ describe('/blog/ as shipped', () => {
 		expect(Object.keys(builtPages).length).toBeGreaterThan(0);
 	});
 
-	it.each(Object.keys(builtPages))('%s does not link to the blog from its navigation', (page) => {
-		expect(navMarkup(builtPages[page])).not.toMatch(BLOG_LINK);
+	// The blog stays out of the navigation until it has a published Post,
+	// then appears on every page (spec #1, user story 38).
+	it.each(Object.keys(builtPages))('%s links to the blog from its navigation if and only if a Post is published', (page) => {
+		expect(BLOG_LINK.test(navMarkup(builtPages[page]))).toBe(published.length > 0);
 	});
 });

@@ -1,11 +1,17 @@
 ---
+import { getCollection } from 'astro:content';
+import { publishedPosts } from '../lib/blog-posts';
 import FireflyMark from './FireflyMark.astro';
 
-// /blog/ is deliberately absent until Posts exist (CONTEXT.md, ADR-none —
-// see the parent spec's "nothing advertises an empty room" decision).
+// /blog/ joins the navigation with the first published Post and not before:
+// nothing advertises an empty room (spec #1, user story 38). Publishing is
+// then a content act — flip a Post's `draft` — with no code change.
+const hasPosts = publishedPosts(await getCollection('blog')).length > 0;
+
 const navItems = [
 	{ href: '/work/', label: 'Work' },
 	{ href: '/about/', label: 'About' },
+	...(hasPosts ? [{ href: '/blog/', label: 'Blog' }] : []),
 	{ href: '/hire/', label: 'Hire' },
 ];
 ---

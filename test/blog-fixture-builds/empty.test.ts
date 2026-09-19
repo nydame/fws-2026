@@ -1,6 +1,6 @@
 import { beforeAll, describe, expect, it } from 'vitest';
 import { draftsIn, emptyFixturePosts, get, listedSlugs, publishedIn, urlFor } from '../blog-fixtures';
-import { escapeHtml, sectionLabelled } from '../content-fixtures';
+import { BLOG_LINK, escapeHtml, navMarkup, sectionLabelled } from '../content-fixtures';
 
 // Runs against the build of test/fixtures/blog-empty (see vitest.config.ts),
 // which holds nothing but a draft: the branch /blog/ is in until the first
@@ -37,5 +37,10 @@ describe('/blog/ with no published Post', () => {
 	it.each(drafts)('gives draft $slug no page and no listing row', async (post) => {
 		expect(blogIndex.html).not.toContain(escapeHtml(post.title));
 		expect((await get(urlFor(post))).status).toBe(404);
+	});
+
+	// Nothing advertises an empty room (spec #1, user story 38).
+	it.each(['/', '/work/', '/blog/'])('keeps the blog out of the navigation on %s', async (path) => {
+		expect(navMarkup((await get(path)).html)).not.toMatch(BLOG_LINK);
 	});
 });

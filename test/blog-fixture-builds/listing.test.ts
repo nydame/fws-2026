@@ -64,8 +64,13 @@ describe('/blog/ with Posts present', () => {
 		expect((await get(urlFor(post))).status).toBe(404);
 	});
 
-	it('still keeps the blog out of the navigation', async () => {
-		expect(navMarkup(blogIndex.html)).not.toMatch(BLOG_LINK);
-		expect(navMarkup((await get('/')).html)).not.toMatch(BLOG_LINK);
+	// The nav link arrives with the first published Post, as a content act
+	// (spec #1, user story 38), on every kind of page, not only the blog's.
+	it.each(['/', '/work/', '/blog/'])('links to the blog from the navigation on %s', async (path) => {
+		expect(navMarkup((await get(path)).html)).toMatch(BLOG_LINK);
+	});
+
+	it.each(published)('links to the blog from the navigation on $slug', async (post) => {
+		expect(navMarkup((await get(urlFor(post))).html)).toMatch(BLOG_LINK);
 	});
 });
