@@ -1,7 +1,7 @@
 // @ts-check
 import { basename } from 'node:path';
 import cloudflare from '@astrojs/cloudflare';
-import { defineConfig } from 'astro/config';
+import { defineConfig, fontProviders } from 'astro/config';
 
 // https://astro.build/config
 export default defineConfig({
@@ -22,6 +22,22 @@ export default defineConfig({
 	// src/pages/hire/inquiry.astro, opts out with `export const prerender = false`
 	// (docs/adr/0001-client-inquiry-pipeline.md).
 	output: 'static',
+	// One typeface, fetched from Fontsource at build and served from this
+	// site's own origin: no request to a font host ever leaves a visitor's
+	// browser. It replaces the 2016 site's Google Fonts, Typekit kit, and
+	// self-hosted Ubuntu set (issue #12). Atkinson Hyperlegible Next is the
+	// Braille Institute's legibility-first typeface, which a practice selling
+	// accessibility should be able to point to.
+	fonts: [
+		{
+			provider: fontProviders.fontsource(),
+			name: 'Atkinson Hyperlegible Next',
+			cssVariable: '--font-body',
+			weights: [400, 700],
+			styles: ['normal', 'italic'],
+			fallbacks: ['system-ui', 'sans-serif'],
+		},
+	],
 	// Canonical + Open Graph/Twitter metadata need an absolute origin.
 	site: 'https://go-firefly.com',
 });

@@ -1,6 +1,9 @@
 ---
+import { Font } from 'astro:assets';
+import Lucy from '../assets/lucy.svg';
 import Footer from '../components/Footer.astro';
 import Header from '../components/Header.astro';
+import '../styles/global.css';
 
 interface Props {
 	title: string;
@@ -18,8 +21,11 @@ const absoluteImageURL = image ? new URL(image, canonicalURL) : undefined;
 	<head>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="icon" href="/favicon.ico" />
+		{/* The mark's own file, so the favicon and the inline mark are one drawing. */}
+		<link rel="icon" type="image/svg+xml" href={Lucy.src} />
+		{/* Only regular upright text is preloaded: it's on every page; bold and
+		    italic load when first used. */}
+		<Font cssVariable="--font-body" preload={[{ weight: 400, style: 'normal' }]} />
 		<link rel="canonical" href={canonicalURL} />
 
 		<title>{title}</title>
@@ -53,8 +59,8 @@ const absoluteImageURL = image ? new URL(image, canonicalURL) : undefined;
 		left: 0;
 		transform: translateY(-100%);
 		padding: 0.5rem 1rem;
-		background: #fff;
-		color: #000;
+		background: var(--paper);
+		color: var(--ink);
 	}
 
 	.skip-link:focus {

@@ -1,4 +1,6 @@
 ---
+import FireflyMark from './FireflyMark.astro';
+
 // /blog/ is deliberately absent until Posts exist (CONTEXT.md, ADR-none —
 // see the parent spec's "nothing advertises an empty room" decision).
 const navItems = [
@@ -9,7 +11,9 @@ const navItems = [
 ---
 
 <header>
-	<p class="site-title"><a href="/">Firefly Web Services</a></p>
+	<p class="site-title">
+		<a href="/"><FireflyMark class="mark" /><span>Firefly Web Services</span></a>
+	</p>
 	<nav aria-label="Primary">
 		<ul>
 			{
@@ -29,8 +33,10 @@ const navItems = [
 		flex-wrap: wrap;
 		align-items: center;
 		justify-content: space-between;
-		gap: 1rem;
-		padding: 1rem;
+		gap: 0.5rem 1.5rem;
+		max-width: calc(var(--measure) + 2 * var(--gutter));
+		margin-inline: auto;
+		padding: 1rem var(--gutter);
 	}
 
 	.site-title {
@@ -39,15 +45,27 @@ const navItems = [
 	}
 
 	.site-title a {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
 		text-decoration: none;
 		color: inherit;
 	}
 
+	.site-title :global(.mark) {
+		width: auto;
+		height: 2.25rem;
+	}
+
 	nav ul {
 		display: flex;
-		gap: 1rem;
+		gap: 1.25rem;
 		margin: 0;
 		padding: 0;
 		list-style: none;
+	}
+
+	nav a {
+		color: inherit;
 	}
 </style>

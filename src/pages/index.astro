@@ -1,5 +1,6 @@
 ---
 import { getCollection } from 'astro:content';
+import FireflyMark from '../components/FireflyMark.astro';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { compareByOrder } from '../lib/project-order';
 
@@ -19,17 +20,22 @@ const featured = (
 	title="Firefly Web Services"
 	description="Web engineering for Mission-Driven Organizations — nonprofits, unions, labs, arts groups, and civic projects."
 >
-	<section class="hero" aria-labelledby="hero-heading">
-		<h1 id="hero-heading">On the web there are no roads. You can go anywhere.</h1>
-		{/* The 2016 tagline, carried over near-verbatim: the one piece of
-		    established personality the old site had that was worth keeping. */}
-		<p class="tagline">But what if you need a guide?</p>
-		<p class="lede">
-			I'm Felicia. I build and repair websites for Mission-Driven Organizations — nonprofits,
-			unions, research labs, arts groups, and civic projects. Work that has to last, on budgets
-			that have to be justified.
-		</p>
-		<p class="cta"><a href="/hire/">Start a conversation</a></p>
+	{/* The site's one dark band: the firefly glows here and nowhere else. */}
+	<section class="hero band-dark" aria-labelledby="hero-heading">
+		<div class="hero-text">
+			<h1 id="hero-heading">On the web there are no roads. You can go anywhere.</h1>
+			{/* The 2016 tagline, carried over near-verbatim: the one piece of
+			    established personality the old site had that was worth keeping.
+			    The firefly beside it is the guide it has been promising. */}
+			<p class="tagline">But what if you need a guide?</p>
+			<p class="lede">
+				I'm Felicia. I build and repair websites for Mission-Driven Organizations — nonprofits,
+				unions, research labs, arts groups, and civic projects. Work that has to last, on budgets
+				that have to be justified.
+			</p>
+			<p class="cta"><a href="/hire/">Start a conversation</a></p>
+		</div>
+		<FireflyMark class="hero-mark" label="A firefly, its tail glowing" />
 	</section>
 
 	<section aria-labelledby="featured-work-heading">
@@ -70,7 +76,9 @@ const featured = (
 
 <style>
 	.hero {
-		padding: 3rem 1rem;
+		display: grid;
+		gap: 1.5rem;
+		padding-block: 2.5rem 3rem;
 	}
 
 	.hero h1 {
@@ -80,9 +88,44 @@ const featured = (
 
 	.tagline {
 		font-style: italic;
+		font-size: 1.2em;
 	}
 
 	.lede {
 		max-width: 60ch;
+	}
+
+	.cta a {
+		display: inline-block;
+		padding: 0.6em 1.2em;
+		border: 2px solid currentColor;
+		border-radius: 0.4em;
+		font-weight: bold;
+		text-decoration: none;
+	}
+
+	.cta a:hover {
+		background: color-mix(in srgb, currentColor 15%, transparent);
+	}
+
+	/* On a phone the firefly leads, small, above the words it guides. */
+	.hero :global(.hero-mark) {
+		order: -1;
+		width: min(12rem, 55%);
+		height: auto;
+		filter: drop-shadow(0 0 1.5rem color-mix(in srgb, var(--glow) 35%, transparent));
+	}
+
+	@media (min-width: 48rem) {
+		.hero {
+			grid-template-columns: 1fr minmax(0, 13rem);
+			align-items: center;
+			padding-block: 4rem;
+		}
+
+		.hero :global(.hero-mark) {
+			order: 0;
+			width: 100%;
+		}
 	}
 </style>

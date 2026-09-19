@@ -1,0 +1,21 @@
+---
+import Lucy from '../assets/lucy.svg';
+
+// Lucy, the firefly: the practice's mark. Inlined so every path stays in the DOM and CSS can reach it.
+// Its outlines are drawn in `currentColor` (class `ink`), so the mark takes
+// the text colour of whatever band it sits in; the glow keeps its own
+// colours, which is what makes it read on the dark band. The same file is
+// the favicon (BaseLayout.astro), so there is one drawing, not two.
+//
+// Pass `label` where the mark stands alone and means something; leave it out
+// where visible text beside it already names the practice, so a screen
+// reader doesn't hear the name twice.
+interface Props {
+	label?: string;
+	class?: string;
+}
+
+const { label, class: className } = Astro.props;
+---
+
+{label ? <Lucy class={className} role="img" aria-label={label} /> : <Lucy class={className} aria-hidden="true" />}

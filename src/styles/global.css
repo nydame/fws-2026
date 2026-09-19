@@ -1,0 +1,107 @@
+/*
+ * The site's base: light, quiet, and typographic, so the one dark band — the
+ * home page's hero — is where the firefly glows (issue #12). Not a dark theme.
+ */
+
+:root {
+	--paper: #fbfaf6;
+	--ink: #22242e;
+	--muted: #595c68;
+	--rule: #dcdad0;
+	--link: #1d5a74;
+
+	/* The dark band, and the glow the mark gives off in it. */
+	--night: #1b1d2a;
+	--night-ink: #f3f1e6;
+	--glow: #f5e663;
+
+	--measure: 44rem;
+	--gutter: 1rem;
+
+	font-family: var(--font-body);
+	line-height: 1.6;
+	color: var(--ink);
+	background: var(--paper);
+}
+
+*,
+*::before,
+*::after {
+	box-sizing: border-box;
+}
+
+body {
+	margin: 0;
+	/* 1rem at a phone's width, rising gently to 1.1875rem on a wide screen. */
+	font-size: clamp(1rem, 0.94rem + 0.3vw, 1.1875rem);
+}
+
+h1,
+h2,
+h3 {
+	line-height: 1.2;
+	text-wrap: balance;
+}
+
+h1 {
+	font-size: clamp(2rem, 1.5rem + 2.5vw, 3rem);
+}
+
+h2 {
+	font-size: clamp(1.4rem, 1.2rem + 1vw, 1.75rem);
+	margin-top: 2.5em;
+}
+
+p,
+li {
+	text-wrap: pretty;
+}
+
+a {
+	color: var(--link);
+	text-underline-offset: 0.15em;
+}
+
+a:hover {
+	text-decoration-thickness: 0.125em;
+}
+
+:focus-visible {
+	outline: 3px solid currentColor;
+	outline-offset: 3px;
+}
+
+/* Every block in <main> sits on one centred measure; a full-bleed band opts
+ * out and pads its own content back onto the same line. */
+main > * {
+	max-width: var(--measure);
+	margin-inline: auto;
+	padding-inline: var(--gutter);
+}
+
+main > :last-child {
+	margin-bottom: 4rem;
+}
+
+.band-dark {
+	max-width: none;
+	padding-inline: max(var(--gutter), (100% - var(--measure)) / 2 + var(--gutter));
+	color: var(--night-ink);
+	background: var(--night);
+}
+
+.band-dark a {
+	color: var(--glow);
+}
+
+input,
+textarea,
+button {
+	font: inherit;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+	html {
+		scroll-behavior: smooth;
+	}
+}
