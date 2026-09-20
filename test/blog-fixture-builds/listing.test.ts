@@ -1,6 +1,7 @@
 import { beforeAll, describe, expect, it } from 'vitest';
 import { draftsIn, get, listedSlugs, listingFixturePosts, type Post, publishedIn, urlFor } from '../blog-fixtures';
 import { BLOG_LINK, escapeHtml, navMarkup } from '../content-fixtures';
+import { advertisedFor, SITE, sitemapUrls } from '../sitemap-fixtures';
 
 // Runs against the build of test/fixtures/blog-listing (see vitest.config.ts),
 // which holds published Posts and a draft: the branch /blog/ switches to the
@@ -72,5 +73,19 @@ describe('/blog/ with Posts present', () => {
 
 	it.each(published)('links to the blog from the navigation on $slug', async (post) => {
 		expect(navMarkup((await get(urlFor(post))).html)).toMatch(BLOG_LINK);
+	});
+});
+
+// The shipping build's sitemap is asserted in test/sitemap.test.ts against
+// whatever content it happens to hold. This build always holds published
+// Posts and a draft, so the rule stays covered even if src/content/blog
+// goes back to being empty.
+describe('the sitemap with Posts present', () => {
+	it.each(published)('advertises $slug', async (post) => {
+		expect(await sitemapUrls()).toContain(`${SITE}${urlFor(post)}`);
+	});
+
+	it.each(drafts)('does not advertise draft $slug', async (post) => {
+		expect(advertisedFor(await sitemapUrls(), post.slug)).toEqual([]);
 	});
 });

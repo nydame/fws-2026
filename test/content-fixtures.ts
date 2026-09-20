@@ -4,6 +4,16 @@
 // Tests assert the *rules* the site is built on against whatever content
 // happens to exist, so editing content never breaks the suite. That means
 // reading the source Markdown, which is what these helpers do.
+import { SELF } from 'cloudflare:test';
+
+/**
+ * The suite's one seam: a request to the built worker (spec #1, Testing
+ * Decisions). Every fixture module and test reaches the site through this,
+ * so "what a visitor sees" means the same thing everywhere.
+ */
+export function request(path: string): Promise<Response> {
+	return SELF.fetch(new URL(path, 'https://example.com/'));
+}
 
 const FRONTMATTER = /^---\r?\n([\s\S]*?)\r?\n---/;
 const LIST_ITEM = /^\s+-\s+(.*)$/;

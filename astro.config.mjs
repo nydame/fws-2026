@@ -1,7 +1,9 @@
 // @ts-check
 import { basename } from 'node:path';
 import cloudflare from '@astrojs/cloudflare';
+import sitemap from '@astrojs/sitemap';
 import { defineConfig, fontProviders } from 'astro/config';
+import { isCrawlable } from './src/lib/crawling';
 
 // https://astro.build/config
 export default defineConfig({
@@ -38,6 +40,13 @@ export default defineConfig({
 			fallbacks: ['system-ui', 'sans-serif'],
 		},
 	],
-	// Canonical + Open Graph/Twitter metadata need an absolute origin.
+	// A sitemap of every route the build produced, so the portfolio is
+	// discoverable without crawling blindly (issue #13). Nothing enumerates
+	// the routes: a Project or Post added as Markdown appears in the sitemap
+	// on the next build, and a draft — which is never built into a route —
+	// cannot appear in it at all. src/lib/crawling.ts says what is left out.
+	integrations: [sitemap({ filter: isCrawlable })],
+	// Canonical + Open Graph/Twitter metadata need an absolute origin, and
+	// the sitemap's absolute URLs and /robots.txt's Sitemap line come from it.
 	site: 'https://go-firefly.com',
 });

@@ -15,8 +15,7 @@
 // bodies run in (see all-routes.test.ts), which is what makes the source
 // Markdown reachable from a test that otherwise only has `SELF.fetch()`.
 // Vite needs each glob's arguments as literals, hence the repetition below.
-import { SELF } from 'cloudflare:test';
-import { bodyOf, parseFrontmatter, requireString, slugFromPath } from './content-fixtures';
+import { bodyOf, parseFrontmatter, request, requireString, slugFromPath } from './content-fixtures';
 
 export interface Post {
 	/** Matches Astro's collection `id`, and so the `/blog/<slug>/` URL. */
@@ -84,6 +83,6 @@ export function listedSlugs(html: string): string[] {
 }
 
 export async function get(path: string) {
-	const response = await SELF.fetch(new URL(path, 'https://example.com/'));
+	const response = await request(path);
 	return { status: response.status, html: await response.text() };
 }
