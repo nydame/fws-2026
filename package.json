@@ -11,7 +11,7 @@
     "preview": "astro preview",
     "astro": "astro",
     "build:blog-fixtures": "BLOG_CONTENT_DIR=./test/fixtures/blog-empty astro build --outDir dist-blog-empty && BLOG_CONTENT_DIR=./test/fixtures/blog-listing astro build --outDir dist-blog-listing",
-    "test": "pnpm build && pnpm build:blog-fixtures && vitest run"
+    "test": "PUBLIC_CF_BEACON_TOKEN=beacon-token-for-tests pnpm build && pnpm build:blog-fixtures && vitest run"
   },
   "dependencies": {
     "@astrojs/cloudflare": "^14.2.5",

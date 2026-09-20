@@ -1,5 +1,6 @@
 import { SELF } from 'cloudflare:test';
 import { beforeAll, describe, expect, it } from 'vitest';
+import { type BuiltPage, fetchPages, ORIGIN } from './built-pages';
 import { builtRoutes } from './built-routes';
 
 // The firefly mark and the fonts (issue #12), checked on every built page.
@@ -7,20 +8,14 @@ import { builtRoutes } from './built-routes';
 // not tested"); what is checked here is what a visitor's browser receives:
 // which requests a page makes, and what its markup exposes.
 
-const ORIGIN = 'https://example.com';
-
-const pages = new Map<string, string>();
+let builtPage: (route: string) => BuiltPage;
 
 beforeAll(async () => {
-	for (const route of builtRoutes) {
-		pages.set(route, await (await SELF.fetch(new URL(route, ORIGIN))).text());
-	}
+	builtPage = await fetchPages(builtRoutes);
 });
 
 function pageAt(route: string): string {
-	const html = pages.get(route);
-	if (html === undefined) throw new Error(`${route} was not fetched`);
-	return html;
+	return builtPage(route).html;
 }
 
 function headerOf(html: string): string {

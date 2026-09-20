@@ -3,6 +3,7 @@ import { Font } from 'astro:assets';
 import Lucy from '../assets/lucy.svg';
 import Footer from '../components/Footer.astro';
 import Header from '../components/Header.astro';
+import WebAnalytics from '../components/WebAnalytics.astro';
 import '../styles/global.css';
 
 interface Props {
@@ -49,6 +50,7 @@ const absoluteImageURL = image ? new URL(image, canonicalURL) : undefined;
 			<slot />
 		</main>
 		<Footer />
+		<WebAnalytics />
 	</body>
 </html>
 

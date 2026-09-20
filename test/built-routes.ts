@@ -26,3 +26,13 @@ export const builtRoutes: string[] = Object.keys(htmlModules)
 	.map(routeForHtmlFile)
 	.filter((route): route is string => route !== null)
 	.sort();
+
+/** A path the build matches nothing for, so requesting it renders the 404 page. */
+export const MISSING_ROUTE = '/this-route-does-not-exist/';
+
+/**
+ * Every page the site renders to a GET: its routes, plus the 404 an unmatched
+ * path resolves to. A sweep meant to cover the whole site wants this one —
+ * the 404 is a page a visitor sees, and it is built from the same layout.
+ */
+export const renderedRoutes: string[] = [...builtRoutes, MISSING_ROUTE];
