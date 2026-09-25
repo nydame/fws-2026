@@ -4,7 +4,7 @@ client: "Magoosh"
 summary: "Replacing a legacy 2019 theme with a modern WordPress block theme, deployed one sub-site at a time."
 startDate: 2023-03-01
 endDate: 2023-09-01
-era: current
+era: recent
 technologies:
   - WordPress 6.2+
   - Gutenberg block themes

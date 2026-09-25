@@ -4,7 +4,7 @@ client: "IBEW Local 1245"
 summary: "A fresh look and mobile-first design for an electrical-workers union's website"
 startDate: 2023-01-01
 endDate: 2023-06-01
-era: current
+era: recent
 technologies:
   - WordPress
   - Genesis Framework

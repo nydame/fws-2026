@@ -32,9 +32,9 @@ _Avoid_: nonprofit (too narrow — IBEW and E3SM are neither), NGO, purpose-driv
 One piece of work, shown to demonstrate capability. The unit the portfolio is built from.
 _Avoid_: case study (the 2016 site's term for narrative HTML fragments; retired), portfolio piece, sample
 
-**Current Work**:
+**Recent Work**:
 Projects from 2018 onward. Leads the portfolio, and carries the argument that she is working now.
-_Avoid_: new work, latest, recent work
+_Avoid_: new work, latest, current work
 
 **Earlier Work**:
 The pre-2018 work from the 2016-era site, kept as a short dated list for career continuity rather than as full Projects. Demoted, not deleted.

@@ -4,7 +4,7 @@ client: "Magoosh"
 summary: "Their homepage is the sales funnel for the entire business, but it was underperforming due to sluggish page loading. After I replaced their expensive optimization plugin with Cloudflare and standard best practices, the page loaded 4x as fast as before."
 startDate: 2022-04-01
 endDate: 2022-12-01
-era: current
+era: recent
 technologies:
   - Cloudflare (APO)
   - WebPageTest

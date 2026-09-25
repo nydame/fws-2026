@@ -3,7 +3,7 @@ title: "Open Budget Oakland: public budget REST API"
 client: "OpenOakland (volunteer, since 2015)"
 summary: "A custom WordPress REST API that serves Oakland budget data to the site's React comparison tool."
 startDate: 2019-06-01
-era: current
+era: recent
 technologies:
   - PHP
   - WordPress REST API

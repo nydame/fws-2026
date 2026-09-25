@@ -1,7 +1,7 @@
 import { SELF } from 'cloudflare:test';
 import { beforeAll, describe, expect, it } from 'vitest';
 import { escapeHtml, sectionLabelled } from './content-fixtures';
-import { featuredProjects, publishedProjects, unfeaturedCurrent, urlFor } from './project-fixtures';
+import { featuredProjects, publishedProjects, unfeaturedRecent, urlFor } from './project-fixtures';
 
 // Read outside the workerd sandbox, so the test can assert on what the page
 // is *written* as and not only on what it renders — which is how "no Project
@@ -53,9 +53,9 @@ describe('/ home page', () => {
 	describe('featured Projects', () => {
 		// Every assertion below iterates the content set, so a set with nothing
 		// featured would pass silently. This is the guard against that.
-		it('the content set has both featured and unfeatured Current Work', () => {
+		it('the content set has both featured and unfeatured Recent Work', () => {
 			expect(featuredProjects.length).toBeGreaterThan(0);
-			expect(unfeaturedCurrent.length).toBeGreaterThan(0);
+			expect(unfeaturedRecent.length).toBeGreaterThan(0);
 		});
 
 		it.each(featuredProjects)('shows featured $slug, linking to its Project page', (project) => {

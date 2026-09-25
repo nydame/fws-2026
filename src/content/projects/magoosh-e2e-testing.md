@@ -4,7 +4,7 @@ client: "Magoosh"
 summary: "A Playwright browser-testing suite that catches site breakage before customers do."
 startDate: 2022-10-01
 endDate: 2023-01-01
-era: current
+era: recent
 technologies:
   - Playwright
   - TypeScript

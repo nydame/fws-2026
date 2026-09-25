@@ -4,7 +4,7 @@ client: "Humane Society of Sonoma County"
 summary: "A robust but inexpensive data pipeline keeps an animal shelter's website in sync with its third-party CRM, saving staff from duplicate manual data entry."
 startDate: 2020-01-01
 endDate: 2021-06-01
-era: current
+era: recent
 technologies:
   - AWS LightSail
   - Digital Ocean

@@ -4,7 +4,7 @@ client: "Dancers Group"
 summary: "A content-rich site for a Bay Area dance nonprofit, with a homepage its staff can curate themselves."
 startDate: 2024-02-01
 endDate: 2024-09-01
-era: current
+era: recent
 technologies:
   - WordPress
   - Genesis Framework

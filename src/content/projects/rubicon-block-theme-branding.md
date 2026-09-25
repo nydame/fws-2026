@@ -4,7 +4,7 @@ client: "Rubicon Programs"
 summary: "Bringing a reentry-services nonprofit's two WordPress sites onto one brand, the modern block-theme way."
 startDate: 2024-09-01
 endDate: 2024-12-01
-era: current
+era: recent
 technologies:
   - WordPress block themes
   - theme.json

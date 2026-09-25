@@ -4,7 +4,7 @@ client: "Firefly Web Services (own business)"
 summary: "Modernizing my business site as a design-token-driven static site with audited performance."
 startDate: 2020-03-01
 endDate: 2021-06-01
-era: current
+era: recent
 technologies:
   - Eleventy
   - Nunjucks

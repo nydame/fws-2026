@@ -4,7 +4,7 @@ client: "Humane Society of Sonoma County"
 summary: "Diagnosing and rebuilding the failed server behind the shelter's live animal listings."
 startDate: 2022-06-01
 endDate: 2022-07-01
-era: current
+era: recent
 technologies:
   - DigitalOcean
   - WordPress

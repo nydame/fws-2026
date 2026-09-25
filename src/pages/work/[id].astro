@@ -6,7 +6,7 @@ import { formatDateRange } from '../../lib/date-range';
 export async function getStaticPaths() {
 	const projects = await getCollection(
 		'projects',
-		({ data }) => data.era === 'current' && !data.draft,
+		({ data }) => data.era === 'recent' && !data.draft,
 	);
 
 	return projects.map((project) => ({

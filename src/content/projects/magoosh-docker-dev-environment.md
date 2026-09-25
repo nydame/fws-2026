@@ -4,7 +4,7 @@ client: "Magoosh"
 summary: "A reproducible local copy of a production WordPress multisite, so development stopped happening against live infrastructure."
 startDate: 2022-01-01
 endDate: 2022-04-01
-era: current
+era: recent
 technologies:
   - Docker Compose
   - WordPress multisite

@@ -3,7 +3,7 @@ title: "Open Budget Oakland: budget data cleaning and standardization workflow"
 client: "OpenOakland (volunteer, since 2015)"
 summary: "Turning the City of Oakland's messy budget spreadsheets into a clean, queryable public database."
 startDate: 2015-06-01
-era: current
+era: recent
 technologies:
   - CSV data wrangling
   - MySQL

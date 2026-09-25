@@ -4,7 +4,7 @@ client: "One Earth Sacred Arts"
 summary: "Moving a revenue-generating store between hosts repeatedly with minimal downtime."
 startDate: 2020-01-01
 endDate: 2021-06-01
-era: current
+era: recent
 technologies:
   - WP Engine
   - BlogVault

@@ -3,7 +3,7 @@ import { glob } from 'astro/loaders';
 import { z } from 'astro/zod';
 
 // A Project: one piece of work shown to demonstrate capability (CONTEXT.md).
-// `era` separates Current Work (2018 onward, gets its own /work/<slug>/ page)
+// `era` separates Recent Work (2018 onward, gets its own /work/<slug>/ page)
 // from Earlier Work (pre-2018, listed as dated rows only — see issue #5).
 const projects = defineCollection({
 	loader: glob({ pattern: '**/*.md', base: './src/content/projects' }),
@@ -15,7 +15,7 @@ const projects = defineCollection({
 		startDate: z.coerce.date(),
 		// Absent means a single date rather than a range.
 		endDate: z.coerce.date().optional(),
-		era: z.enum(['current', 'earlier']),
+		era: z.enum(['recent', 'earlier']),
 		technologies: z.array(z.string()),
 		liveUrl: z.string().url().optional(),
 		screenshot: z.string().optional(),

@@ -4,7 +4,7 @@ client: "One Earth Sacred Arts"
 summary: "Making sure a store's order and contact-form email actually reaches inboxes."
 startDate: 2021-07-01
 endDate: 2021-09-01
-era: current
+era: recent
 technologies:
   - WordPress
   - Post SMTP

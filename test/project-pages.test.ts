@@ -1,7 +1,7 @@
 import { SELF } from 'cloudflare:test';
 import { describe, expect, it } from 'vitest';
 import { escapeHtml } from './content-fixtures';
-import { draftProjects, earlierProjects, publishedCurrent, urlFor } from './project-fixtures';
+import { draftProjects, earlierProjects, publishedRecent, urlFor } from './project-fixtures';
 
 // Wording the site has retired or must never ship, checked on every Project
 // page rather than on one hand-picked example. "case study" is the 2016 site's
@@ -15,7 +15,7 @@ async function get(path: string) {
 
 describe('Project pages', () => {
 	it('the content set exercises published, draft, and Earlier Work Projects', () => {
-		expect(publishedCurrent.length).toBeGreaterThan(0);
+		expect(publishedRecent.length).toBeGreaterThan(0);
 		expect(draftProjects.length).toBeGreaterThan(0);
 		expect(earlierProjects.length).toBeGreaterThan(0);
 	});
@@ -28,11 +28,11 @@ describe('Project pages', () => {
 		expect((await get(urlFor(project))).status).toBe(404);
 	});
 
-	it.each(publishedCurrent)('$slug is served at its own URL', async (project) => {
+	it.each(publishedRecent)('$slug is served at its own URL', async (project) => {
 		expect((await get(urlFor(project))).status).toBe(200);
 	});
 
-	it.each(publishedCurrent)('$slug names its Client only when it has one', async (project) => {
+	it.each(publishedRecent)('$slug names its Client only when it has one', async (project) => {
 		const { html } = await get(urlFor(project));
 
 		if (project.client) {
@@ -45,7 +45,7 @@ describe('Project pages', () => {
 		}
 	});
 
-	it.each(publishedCurrent)('$slug ships no placeholder or retired wording', async (project) => {
+	it.each(publishedRecent)('$slug ships no placeholder or retired wording', async (project) => {
 		const { html } = await get(urlFor(project));
 
 		for (const pattern of FORBIDDEN) {

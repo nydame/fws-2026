@@ -25,7 +25,7 @@ export interface Project {
 	client?: string;
 	summary: string;
 	startDate: string;
-	era: 'current' | 'earlier';
+	era: 'recent' | 'earlier';
 	/** Selects the Project onto the home page's shop window. */
 	featured: boolean;
 	order: number;
@@ -35,7 +35,7 @@ export interface Project {
 function toProject(path: string, raw: string): Project {
 	const fields = parseFrontmatter(raw, path);
 	const era = requireString(fields, 'era', path);
-	if (era !== 'current' && era !== 'earlier') throw new Error(`Unknown era "${era}" in ${path}`);
+	if (era !== 'recent' && era !== 'earlier') throw new Error(`Unknown era "${era}" in ${path}`);
 
 	const client = fields.client;
 	return {
@@ -60,7 +60,7 @@ export const allProjects: Project[] = Object.entries(sources)
 	.sort(byOrder);
 
 /** Gets a `/work/<slug>/` page. */
-export const publishedCurrent = allProjects.filter((p) => p.era === 'current' && !p.draft);
+export const publishedRecent = allProjects.filter((p) => p.era === 'recent' && !p.draft);
 /** Listed on `/work/` as a dated row only. */
 export const publishedEarlier = allProjects.filter((p) => p.era === 'earlier' && !p.draft);
 /** Every Project the build renders somewhere on /work/. */
@@ -72,9 +72,9 @@ export const publishedProjects = allProjects.filter((p) => !p.draft);
  * Work Project would otherwise make the suite demand a `/work/<slug>/` link
  * for a Project that deliberately has no page.
  */
-export const featuredProjects = publishedCurrent.filter((p) => p.featured);
-/** Published Current Work the home page deliberately leaves off. */
-export const unfeaturedCurrent = publishedCurrent.filter((p) => !p.featured);
+export const featuredProjects = publishedRecent.filter((p) => p.featured);
+/** Published Recent Work the home page deliberately leaves off. */
+export const unfeaturedRecent = publishedRecent.filter((p) => !p.featured);
 /** Must not appear anywhere in the build. */
 export const draftProjects = allProjects.filter((p) => p.draft);
 /** No Earlier Work Project gets a page, draft or not. */

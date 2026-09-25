@@ -4,7 +4,7 @@ client: "OpenOakland (volunteer, since 2015)"
 summary: "Modernizing a site that volunteers were afraid to touch led to more features shipping faster."
 startDate: 2021-06-03
 endDate: 2021-11-02
-era: current
+era: recent
 technologies:
   - React.js
   - D3.js

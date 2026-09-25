@@ -6,13 +6,13 @@ import { compareByOrder } from '../../lib/project-order';
 
 const projects = await getCollection('projects', ({ data }) => !data.draft);
 
-const currentWork = projects.filter((project) => project.data.era === 'current').sort(compareByOrder);
+const recentWork = projects.filter((project) => project.data.era === 'recent').sort(compareByOrder);
 const earlierWork = projects.filter((project) => project.data.era === 'earlier').sort(compareByOrder);
 ---
 
 <BaseLayout
 	title="Work · Firefly Web Services"
-	description="Services, Current Work, and a decade of Earlier Work for Mission-Driven Organizations."
+	description="Services, Recent Work, and a decade of Earlier Work for Mission-Driven Organizations."
 >
 	<h1>Work</h1>
 
@@ -25,11 +25,11 @@ const earlierWork = projects.filter((project) => project.data.era === 'earlier')
 		</p>
 	</section>
 
-	<section aria-labelledby="current-work-heading">
-		<h2 id="current-work-heading">Current Work</h2>
+	<section aria-labelledby="recent-work-heading">
+		<h2 id="recent-work-heading">Recent Work</h2>
 		<ul>
 			{
-				currentWork.map((project) => (
+				recentWork.map((project) => (
 					<li>
 						<a href={`/work/${project.id}/`}>{project.data.title}</a>
 						<p>{project.data.summary}</p>
@@ -46,7 +46,7 @@ const earlierWork = projects.filter((project) => project.data.era === 'earlier')
 			{
 				earlierWork.map((project) => (
 					<li>
-						{/* Same shape as Current Work, but the title is bold rather than a
+						{/* Same shape as Recent Work, but the title is bold rather than a
 						    link: an Earlier Work Project has no /work/<slug>/ page. */}
 						<strong>{project.data.title}</strong>
 						<p>{project.data.summary}</p>

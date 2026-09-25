@@ -4,7 +4,7 @@ client: "Magoosh"
 summary: "A test-prep company's massive WordPress multisite gets an upgrade from end-of-life PHP to PHP 8 with zero downtime."
 startDate: 2022-12-01
 endDate: 2023-03-01
-era: current
+era: recent
 technologies:
   - PHP 8
   - WordPress multisite

@@ -11,7 +11,7 @@ import { compareByOrder } from '../lib/project-order';
 const featured = (
 	await getCollection(
 		'projects',
-		({ data }) => data.featured && !data.draft && data.era === 'current',
+		({ data }) => data.featured && !data.draft && data.era === 'recent',
 	)
 ).sort(compareByOrder);
 ---

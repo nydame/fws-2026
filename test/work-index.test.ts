@@ -3,7 +3,7 @@ import { beforeAll, describe, expect, it } from 'vitest';
 import { escapeHtml, sectionLabelled } from './content-fixtures';
 import {
 	draftProjects,
-	publishedCurrent,
+	publishedRecent,
 	publishedEarlier,
 	publishedProjects,
 	urlFor,
@@ -18,8 +18,8 @@ beforeAll(async () => {
 describe('/work/ index', () => {
 	// Every assertion below iterates the content set, so an empty set would
 	// pass silently. This is the guard against that.
-	it('the content set exercises Current Work, Earlier Work, and drafts', () => {
-		expect(publishedCurrent.length).toBeGreaterThan(0);
+	it('the content set exercises Recent Work, Earlier Work, and drafts', () => {
+		expect(publishedRecent.length).toBeGreaterThan(0);
 		expect(publishedEarlier.length).toBeGreaterThan(0);
 		expect(draftProjects.length).toBeGreaterThan(0);
 	});
@@ -29,17 +29,17 @@ describe('/work/ index', () => {
 		expect(response.status).toBe(200);
 	});
 
-	it.each(publishedCurrent)('lists Current Work $slug, linking to its Project page', (project) => {
-		const currentWork = sectionLabelled(html, 'current-work-heading');
-		expect(currentWork).toContain(`href="${urlFor(project)}"`);
-		expect(currentWork).toContain(escapeHtml(project.title));
+	it.each(publishedRecent)('lists Recent Work $slug, linking to its Project page', (project) => {
+		const recentWork = sectionLabelled(html, 'recent-work-heading');
+		expect(recentWork).toContain(`href="${urlFor(project)}"`);
+		expect(recentWork).toContain(escapeHtml(project.title));
 	});
 
-	it('orders Current Work by the frontmatter order key', () => {
-		const currentWork = sectionLabelled(html, 'current-work-heading');
-		const linked = [...currentWork.matchAll(/href="\/work\/([^/"]+)\//g)].map((m) => m[1]);
+	it('orders Recent Work by the frontmatter order key', () => {
+		const recentWork = sectionLabelled(html, 'recent-work-heading');
+		const linked = [...recentWork.matchAll(/href="\/work\/([^/"]+)\//g)].map((m) => m[1]);
 
-		expect(linked).toEqual(publishedCurrent.map((project) => project.slug));
+		expect(linked).toEqual(publishedRecent.map((project) => project.slug));
 	});
 
 	it.each(draftProjects)('omits draft $slug entirely', (project) => {
@@ -52,10 +52,10 @@ describe('/work/ index', () => {
 		if (titleIsItsOwn) expect(html).not.toContain(escapeHtml(project.title));
 	});
 
-	it.each(publishedEarlier)('renders Earlier Work $slug like Current Work, minus the link', (project) => {
+	it.each(publishedEarlier)('renders Earlier Work $slug like Recent Work, minus the link', (project) => {
 		const earlierWork = sectionLabelled(html, 'earlier-work-heading');
 
-		// Same summary and date as a Current Work entry, but the title is bold
+		// Same summary and date as a Recent Work entry, but the title is bold
 		// rather than a link, because there is no /work/<slug>/ page to link to.
 		expect(earlierWork).toContain(`<strong>${escapeHtml(project.title)}</strong>`);
 		expect(earlierWork).toContain(escapeHtml(project.summary));

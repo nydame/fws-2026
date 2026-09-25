@@ -3,7 +3,7 @@ title: "An AI Job Search Assistant That Writes Grounded, Insightful Resumes"
 client: "Personal project (2026)"
 summary: "Claude uses my custom skills to curate a career wiki and draft job application materials grounded in that knowledgebase."
 startDate: 2026-07-01
-era: current
+era: recent
 technologies:
   - Claude Cowork
   - Custom agent skills
