@@ -14,9 +14,9 @@
     "test": "PUBLIC_CF_BEACON_TOKEN=beacon-token-for-tests pnpm build && pnpm build:blog-fixtures && vitest run"
   },
   "dependencies": {
-    "@astrojs/cloudflare": "^14.2.5",
+    "@astrojs/cloudflare": "^14.3.3",
     "@astrojs/sitemap": "^3.7.4",
-    "astro": "^7.2.9"
+    "astro": "^7.3.5"
   },
   "devDependencies": {
     "@cloudflare/vitest-pool-workers": "^0.22.0",
