@@ -1,10 +1,10 @@
 ---
 title: "A custom website and WooCommerce store for an arts collective"
 client: "One Earth Sacred Arts"
-summary: "From a simple blog to a profitable online store, I've partnered with OESA for 12 years"
+summary: "From a simple blog to a profitable online store, I partnered with OESA for 12 years"
 startDate: 2012-01-01
 endDate: 2024-12-01
-era: current
+era: earlier
 technologies:
   - WordPress
   - WooCommerce
