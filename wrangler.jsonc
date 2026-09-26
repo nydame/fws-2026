@@ -16,12 +16,6 @@
 			"binding": "DB",
 			"database_name": "fws-2026",
 			"database_id": "3a0bfe95-02bc-4c99-a29c-4e019aaad419"
-		},
-		{
-			"binding": "fws_2026",
-			"database_name": "fws-2026",
-			"database_id": "3a0bfe95-02bc-4c99-a29c-4e019aaad419",
-			"remote": true
 		}
 	],
 	// Set with `wrangler secret put`, never here: this names the secrets the
