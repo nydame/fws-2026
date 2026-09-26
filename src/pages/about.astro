@@ -1,0 +1,57 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+// DRAFT COPY — structure and constraints are settled; the wording is not.
+// Everything below is grounded in CONTEXT.md, the positioning decision, and
+// the Clients named in src/content/projects/. Nothing here is invented
+// biography, because there are no notes for this page yet. Felicia rewrites
+// it in her own voice; the tests guard the constraints, not the sentences.
+//
+// What the 2016 page did that this one must not (issue #7): a three-question
+// Q&A, a published $75/hour rate, and an answer stating the site was built
+// with Pico — false the moment it was migrated.
+---
+
+<BaseLayout
+	title="About · Firefly Web Services"
+  description="Felicia Betancourt — a solo web engineer working with entrepreneurs, nonprofits, unions, research labs, art collectives, and civic groups."
+>
+<h1>Hello, pleased to meet you!</h1>
+
+	<h2>
+    I'm Felicia, a web developer and forward-deployed engineer working as Firefly Web Services.
+	</h2>
+
+	<section aria-labelledby="who-heading">
+		<h2 id="who-heading">I work with mission-driven organizations</h2>
+		<p>
+    Over the past 15+ years, I've worked with artists and scientists, entrepreneurs and nonprofits. An electrical workers' union that needed a site
+    its members could read in the field. A sacred arts organization selling work online. A start-up in the ed-tech space that had to move fast without breaking things.</p>
+    <p>In addition,
+			as a volunteer with OpenOakland since 2015, I've helped to make the Oakland municipal budget accessible and legible to the people it truly belongs to.
+		</p>
+		<p>
+    Admitedly, these are wildly disparate groups with completely different goals. But here's what they all have in common: every single one
+    had real-life constraints that could not be shrugged away. For some it was a tight budget; for others, a staff with no time to spare.
+		</p>
+	</section>
+
+	<section aria-labelledby="how-heading">
+    <h2 id="how-heading">Your constraints are not in the way; they are the way</h2>
+    <p>I live and work in the real world, where time and money are rarely as abundant as we would like. Experience has taught me that having a bit less than we think we need forces us to focus on what is truly essential and removes the temptation to be distracted by too many options or shiny, new trends.</p>
+		<p>
+    For example, a good deal of what I build is WordPress because that is where many organizations
+			already are. Moving a working site off a platform the staff already understands in favor of one that is trending in developer circles rarely does anyone any favors.
+      However, if a more modern, lightweight approach is appropriate, I'll say
+      so, and explain why. In any case, I always strive to create solutions that fit the actual circumstances.
+		</p>
+		<p>
+			I also try to leave things better documented than I found them, and to hand back something
+			maintainable by whoever comes next, including the version of you from the future who has forgotten how all the pieces fit together. The extensive notes I take on each project mean that no client has ever had to face a post-production problem alone. My commitment extends to accessibility and performance as well; a site that's slow on a phone or unusable with a keyboard isn't finished.
+		</p>
+	</section>
+
+	<p>
+		If any of that sounds like what you need, <a href="/hire/">tell me about your project</a>.
+	</p>
+</BaseLayout>

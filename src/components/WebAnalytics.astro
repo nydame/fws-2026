@@ -1,0 +1,13 @@
+---
+import { BEACON_CONFIG, BEACON_SRC } from '../lib/web-analytics';
+
+// The Cloudflare Web Analytics beacon, on every page through BaseLayout. A
+// build with no PUBLIC_CF_BEACON_TOKEN renders nothing here
+// (docs/adr/0002-cloudflare-web-analytics.md).
+//
+// `is:inline` keeps the tag exactly as written: Astro has nothing to bundle
+// for a script it doesn't own, and the beacon has to reach the browser as
+// Cloudflare publishes it.
+---
+
+{BEACON_CONFIG && <script is:inline defer src={BEACON_SRC} data-cf-beacon={BEACON_CONFIG} />}

@@ -1,0 +1,32 @@
+{
+	"$schema": "node_modules/wrangler/config-schema.json",
+	"name": "fws-2026",
+	"compatibility_date": "2026-08-22",
+	"compatibility_flags": ["nodejs_compat"],
+	// Serve src/pages/404.astro's build output for any unmatched path, with a
+	// real 404 status, instead of Workers Static Assets' default empty 404.
+	"assets": {
+		"not_found_handling": "404-page"
+	},
+	// D1 storage for the Client Inquiry pipeline (docs/adr/0001-client-inquiry-pipeline.md).
+	// No real database has been provisioned yet: `database_id` is a placeholder,
+	// resolvable only against the local binding used by tests and `wrangler dev`.
+	"d1_databases": [
+		{
+			"binding": "DB",
+			"database_name": "fws-2026",
+			"database_id": "00000000-0000-0000-0000-000000000000"
+		}
+	],
+	// Set with `wrangler secret put`, never here: this names the secrets the
+	// Worker needs, so `wrangler types` and `wrangler dev` know about them.
+	// TURNSTILE_SECRET_KEY verifies the Hire page's Turnstile token (issue #10).
+	// RESEND_API_KEY sends the practitioner a notification of each Client
+	// Inquiry (issue #11), from INQUIRY_NOTIFICATION_FROM — an address on a
+	// domain verified in Resend — to INQUIRY_NOTIFICATION_TO. The two addresses
+	// aren't credentials, but they're set the same way so a personal inbox
+	// never lands in the repo, and so a deploy without them fails loudly.
+	"secrets": {
+		"required": ["TURNSTILE_SECRET_KEY", "RESEND_API_KEY", "INQUIRY_NOTIFICATION_FROM", "INQUIRY_NOTIFICATION_TO"]
+	}
+}

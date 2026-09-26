@@ -1,3 +1,9 @@
+# pnpm blocks a dependency's install/postinstall scripts by default; each
+# entry here allowlists one package's native build step. `esbuild` and
+# `sharp` are Astro's own toolchain and image service. `workerd` is
+# Cloudflare's runtime, needed locally by `wrangler` and
+# `@cloudflare/vitest-pool-workers` (see vitest.config.ts).
 allowBuilds:
   esbuild: true
   sharp: true
+  workerd: true

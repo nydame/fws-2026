@@ -1,0 +1,57 @@
+---
+import { getCollection, render } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { formatDateRange } from '../../lib/date-range';
+
+export async function getStaticPaths() {
+	const projects = await getCollection(
+		'projects',
+		({ data }) => data.era === 'recent' && !data.draft,
+	);
+
+	return projects.map((project) => ({
+		params: { id: project.id },
+		props: { project },
+	}));
+}
+
+const { project } = Astro.props;
+const { data } = project;
+const { Content } = await render(project);
+
+const dateRange = formatDateRange(data);
+---
+
+<BaseLayout
+	title={`${data.title} · Firefly Web Services`}
+	description={data.summary}
+	image={data.screenshot}
+>
+	<h1>{data.title}</h1>
+	<p>{data.summary}</p>
+	<dl>
+		{
+			data.client && (
+				<>
+					<dt>Client</dt>
+					<dd>{data.client}</dd>
+				</>
+			)
+		}
+		<dt>Date</dt>
+		<dd>{dateRange}</dd>
+		<dt>Technologies</dt>
+		<dd>{data.technologies.join(', ')}</dd>
+		{
+			data.liveUrl && (
+				<>
+					<dt>Live site</dt>
+					<dd>
+						<a href={data.liveUrl}>{data.liveUrl}</a>
+					</dd>
+				</>
+			)
+		}
+	</dl>
+	<Content />
+</BaseLayout>

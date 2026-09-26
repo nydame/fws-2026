@@ -1,0 +1,63 @@
+---
+import { env } from 'cloudflare:workers';
+import HirePage from '../../components/HirePage.astro';
+import { hasErrors, readForm, readInquiry, storeInquiry, validateInquiry } from '../../lib/client-inquiry';
+import { notifyOfInquiry } from '../../lib/inquiry-notification';
+import { verifyTurnstile } from '../../lib/turnstile';
+
+// The one route in the site that is not prerendered: it receives a Client
+// Inquiry (docs/adr/0001-client-inquiry-pipeline.md). Each outcome is a
+// response a Prospective Client can trust:
+//
+//   - stored:            303 to /hire/received/, which says so plainly,
+//                        whether or not the notification then went out
+//   - invalid:           422, the Hire page again with field-level messages
+//   - failed Turnstile:  403, the Hire page again, not saying why
+//   - storage failed:    500, the Hire page again with an honest error
+//
+// Every error response carries everything the Prospective Client wrote, so
+// nothing is retyped, and none ever writes a row or claims success. They
+// render HTML, which is why this is a page rather than a `.ts` endpoint.
+//
+// Turnstile is checked after validation, so an inquiry that needs fixing
+// never spends a siteverify call, and before storage, so nothing unverified
+// is ever written.
+//
+// The practitioner is notified through Resend only after the row is written,
+// so a failed notification never costs an inquiry: the row stays, marked
+// `failed`, and the Prospective Client is still told it was received.
+export const prerender = false;
+
+// Nothing to receive outside a form post; send a stray visit to the form.
+if (Astro.request.method !== 'POST') return Astro.redirect('/hire/', 303);
+
+const form = await readForm(Astro.request);
+const values = readInquiry(form);
+const errors = validateInquiry(values);
+let turnstileFailed = false;
+let storageFailed = false;
+let inquiryId: number | undefined;
+
+if (!hasErrors(errors)) {
+	turnstileFailed = !(await verifyTurnstile(form, env.TURNSTILE_SECRET_KEY));
+}
+
+if (!hasErrors(errors) && !turnstileFailed) {
+	try {
+		inquiryId = await storeInquiry(env.DB, values);
+	} catch (error) {
+		// Logs the failure, never the inquiry: its contents are personal data.
+		console.error('A valid Client Inquiry could not be stored:', error);
+		storageFailed = true;
+	}
+}
+
+if (inquiryId !== undefined) {
+	await notifyOfInquiry(env.DB, env, inquiryId, values);
+	return Astro.redirect('/hire/received/', 303);
+}
+
+Astro.response.status = storageFailed ? 500 : turnstileFailed ? 403 : 422;
+---
+
+<HirePage values={values} errors={errors} turnstileFailed={turnstileFailed} storageFailed={storageFailed} />

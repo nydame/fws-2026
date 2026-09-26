@@ -1,0 +1,77 @@
+---
+import { getCollection } from 'astro:content';
+import { publishedPosts } from '../lib/blog-posts';
+import FireflyMark from './FireflyMark.astro';
+
+// /blog/ joins the navigation with the first published Post and not before:
+// nothing advertises an empty room (spec #1, user story 38). Publishing is
+// then a content act — flip a Post's `draft` — with no code change.
+const hasPosts = publishedPosts(await getCollection('blog')).length > 0;
+
+const navItems = [
+	{ href: '/work/', label: 'Work' },
+	{ href: '/about/', label: 'About' },
+	...(hasPosts ? [{ href: '/blog/', label: 'Blog' }] : []),
+	{ href: '/hire/', label: 'Hire' },
+];
+---
+
+<header>
+	<p class="site-title">
+		<a href="/"><FireflyMark class="mark" /><span>Firefly Web Services</span></a>
+	</p>
+	<nav aria-label="Primary">
+		<ul>
+			{
+				navItems.map((item) => (
+					<li>
+						<a href={item.href}>{item.label}</a>
+					</li>
+				))
+			}
+		</ul>
+	</nav>
+</header>
+
+<style>
+	header {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		justify-content: space-between;
+		gap: 0.5rem 1.5rem;
+		max-width: calc(var(--measure) + 2 * var(--gutter));
+		margin-inline: auto;
+		padding: 1rem var(--gutter);
+	}
+
+	.site-title {
+		margin: 0;
+		font-weight: bold;
+	}
+
+	.site-title a {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		text-decoration: none;
+		color: inherit;
+	}
+
+	.site-title :global(.mark) {
+		width: auto;
+		height: 2.25rem;
+	}
+
+	nav ul {
+		display: flex;
+		gap: 1.25rem;
+		margin: 0;
+		padding: 0;
+		list-style: none;
+	}
+
+	nav a {
+		color: inherit;
+	}
+</style>

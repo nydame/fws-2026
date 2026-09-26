@@ -1,0 +1,22 @@
+---
+const year = new Date().getFullYear();
+---
+
+<footer>
+	<p>&copy; {year} Firefly Web Services</p>
+</footer>
+
+<style>
+	footer {
+		max-width: calc(var(--measure) + 2 * var(--gutter));
+		margin-inline: auto;
+		padding: 1.5rem var(--gutter) 2rem;
+		border-top: 1px solid var(--rule);
+		color: var(--muted);
+		font-size: 0.875em;
+	}
+
+	footer p {
+		margin: 0;
+	}
+</style>
