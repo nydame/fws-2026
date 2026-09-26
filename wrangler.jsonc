@@ -2,20 +2,26 @@
 	"$schema": "node_modules/wrangler/config-schema.json",
 	"name": "fws-2026",
 	"compatibility_date": "2026-08-22",
-	"compatibility_flags": ["nodejs_compat"],
+	"compatibility_flags": [
+		"nodejs_compat"
+	],
 	// Serve src/pages/404.astro's build output for any unmatched path, with a
 	// real 404 status, instead of Workers Static Assets' default empty 404.
 	"assets": {
 		"not_found_handling": "404-page"
 	},
 	// D1 storage for the Client Inquiry pipeline (docs/adr/0001-client-inquiry-pipeline.md).
-	// No real database has been provisioned yet: `database_id` is a placeholder,
-	// resolvable only against the local binding used by tests and `wrangler dev`.
 	"d1_databases": [
 		{
 			"binding": "DB",
 			"database_name": "fws-2026",
-			"database_id": "00000000-0000-0000-0000-000000000000"
+			"database_id": "3a0bfe95-02bc-4c99-a29c-4e019aaad419"
+		},
+		{
+			"binding": "fws_2026",
+			"database_name": "fws-2026",
+			"database_id": "3a0bfe95-02bc-4c99-a29c-4e019aaad419",
+			"remote": true
 		}
 	],
 	// Set with `wrangler secret put`, never here: this names the secrets the
@@ -27,6 +33,11 @@
 	// aren't credentials, but they're set the same way so a personal inbox
 	// never lands in the repo, and so a deploy without them fails loudly.
 	"secrets": {
-		"required": ["TURNSTILE_SECRET_KEY", "RESEND_API_KEY", "INQUIRY_NOTIFICATION_FROM", "INQUIRY_NOTIFICATION_TO"]
+		"required": [
+			"TURNSTILE_SECRET_KEY",
+			"RESEND_API_KEY",
+			"INQUIRY_NOTIFICATION_FROM",
+			"INQUIRY_NOTIFICATION_TO"
+		]
 	}
 }
