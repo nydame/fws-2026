@@ -7,8 +7,16 @@
 	],
 	// Serve src/pages/404.astro's build output for any unmatched path, with a
 	// real 404 status, instead of Workers Static Assets' default empty 404.
+	//
+	// With not_found_handling set and this compatibility date, a navigation
+	// request — anything a browser sends with `Sec-Fetch-Mode: navigate`,
+	// including the Hire form's post — is served from assets and never reaches
+	// the Worker, so the post got an empty 405. run_worker_first sends the
+	// Client Inquiry endpoint to the Worker regardless. The test suite can't
+	// catch a regression here: its local runtime doesn't apply that routing.
 	"assets": {
-		"not_found_handling": "404-page"
+		"not_found_handling": "404-page",
+		"run_worker_first": ["/hire/inquiry", "/hire/inquiry/"]
 	},
 	// D1 storage for the Client Inquiry pipeline (docs/adr/0001-client-inquiry-pipeline.md).
 	"d1_databases": [
